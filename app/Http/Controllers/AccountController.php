@@ -7,8 +7,6 @@ use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use App\Services\AccountService;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-
 class AccountController extends Controller
 {
     public function __construct(

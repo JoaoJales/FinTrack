@@ -9,7 +9,6 @@ use App\Services\AccountService;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 
 class TransactionController extends Controller
 {
