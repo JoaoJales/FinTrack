@@ -25,6 +25,7 @@ class Institution extends Model
     ];
     protected $casts = [
         'name' => 'string',
+        'color' => 'string',
     ];
 
     public function accounts(): HasMany {

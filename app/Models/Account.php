@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountType;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name Apelido para Conta
  * @property double $initial_balance Saldo Inicial
  * @property AccountType $account_type Tipo de Conta (Corretente, Carteira, Poupança, Investimento, etc)
+ * @property float $current_balance Saldo Atual (virtual — calculado via transações)
  */
 class Account extends Model
 {
@@ -48,5 +50,29 @@ class Account extends Model
 
     public function transactions(): HasMany {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Saldo atual = saldo inicial + entradas - saídas.
+     * Atributo virtual — não existe no banco, calculado em tempo real.
+     */
+    protected function currentBalance(): Attribute
+    {
+        //O selectRaw() permite escrever SQL puro dentro da query do Eloquent.
+        return Attribute::make(
+            get: function () {
+                $transactions = $this->transactions()
+                    ->join('categories', 'transactions.category_id', '=', 'categories.id')
+                    ->selectRaw("
+                        SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
+                        SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
+                    ")
+                    ->first();
+
+                return (float)$this->initial_balance
+                    + (float)($transactions->total_income ?? 0)
+                    - (float)($transactions->total_expense ?? 0);
+            }
+        );
     }
 }
