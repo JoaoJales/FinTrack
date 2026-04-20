@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TransactionType;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
     public function __construct(private CategoryService $categoryService)
     {
     }
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Category::class);
-        $categories = $this->categoryService->getAllByUser(auth()->id());
+        $categories = $this->categoryService->getAllCreatedByUser(auth()->id(), $request->get('type', TransactionType::EXPENSE->value));
 
         return view('categories.index', compact('categories'));
     }

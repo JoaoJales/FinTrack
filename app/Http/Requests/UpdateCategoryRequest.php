@@ -25,6 +25,8 @@ class UpdateCategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'type' => 'required',
+            'color' => ['required', 'string'],
+            'icon' => ['required', 'string'],
         ];
     }
 

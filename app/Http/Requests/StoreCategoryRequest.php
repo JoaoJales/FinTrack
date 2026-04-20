@@ -28,14 +28,18 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', new CheckCategoryLimit()],
             'type' => ['required', new Enum(TransactionType::class)],
+            'color' => ['required', 'string'],
+            'icon' => ['required', 'string'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'Campo obrigatório',
-            'type.required' => 'Campo obrigatório',
+            'name.required' => 'Campo (Nome) é obrigatório',
+            'type.required' => 'Campo (Tipo) é obrigatório',
+            'color.required' => 'Campo (Cor) é obrigatório',
+            'icon.required' => 'Campo (Icone) é obrigatório',
         ];
     }
 }

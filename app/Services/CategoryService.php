@@ -17,6 +17,15 @@ class CategoryService
             ->get();
     }
 
+    public function getAllCreatedByUser(int $userId, $type): Collection
+    {
+        return Category::where('user_id', $userId)
+            ->where('is_editable', true)
+            ->where('type', $type)
+            ->orderBy('type')
+            ->get();
+    }
+
     public function getOnlyTrashedByUser(int $userId): Collection
     {
         return Category::where('user_id', $userId)
@@ -27,6 +36,7 @@ class CategoryService
     public function store(array $request, int $userId): Category
     {
         $request['user_id'] = $userId;
+        $request['is_editable'] = true;
 
         return Category::create($request);
     }

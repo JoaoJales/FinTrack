@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Enums\TransactionType;
 use App\Models\Category;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -18,10 +19,15 @@ class CheckCategoryLimit implements ValidationRule
     {
         $user = auth()->user();
         $limit = 10;
-        $count = Category::where('user_id', $user->id);
+        $countExpense = Category::where('user_id', $user->id)->where('type', TransactionType::EXPENSE->value)->count();
+        $countIncome = Category::where('user_id', $user->id)->where('type', TransactionType::INCOME->value)->count();
 
-        if ($count >= $limit) {
-            $fail("Você atingiu o limite máximo de {$limit} categorias permitidas.");
+        if ($countExpense >= $limit) {
+            $fail("Você atingiu o limite máximo de {$limit} categorias do tipo gasto permitidas.");
+        }
+
+        if ($countIncome >= $limit) {
+            $fail("Você atingiu o limite máximo de {$limit} categorias do tipo ganho permitidas.");
         }
     }
 }
