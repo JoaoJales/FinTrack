@@ -16,8 +16,8 @@ enum TransactionType: string
 
     public function color(): string {
         return match ($this) {
-            self::INCOME => 'bg-green-600',
-            self::EXPENSE => 'bg-red-600',
+            self::INCOME => 'text-emerald-600',
+            self::EXPENSE => 'text-rose-600',
         };
     }
 
