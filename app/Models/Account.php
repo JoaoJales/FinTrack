@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Enums\AccountType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Account
@@ -21,8 +21,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Account extends Model
 {
-    use SoftDeletes;
-
     public $table = 'accounts';
     protected $fillable = [
         'user_id',
@@ -30,6 +28,7 @@ class Account extends Model
         'name',
         'initial_balance',
         'account_type',
+        'is_default'
     ];
     protected $casts = [
         'user_id' => 'integer',
@@ -37,6 +36,7 @@ class Account extends Model
         'name' => 'string',
         'initial_balance' => 'decimal:2',
         'account_type' => AccountType::class,
+        'is_default' => 'boolean'
     ];
 
     public function user(): BelongsTo
@@ -50,6 +50,11 @@ class Account extends Model
 
     public function transactions(): HasMany {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function scopeDefault(Builder $query): Builder
+    {
+        return $query->where('is_default', true);
     }
 
     /**

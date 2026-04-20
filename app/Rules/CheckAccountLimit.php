@@ -16,7 +16,7 @@ class CheckAccountLimit implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $user = auth()->user();
-        $limit = 5;
+        $limit = 15;
 
         if ($user->accounts()->count() >= $limit) {
             $fail("Você atingiu o limite máximo de {$limit} contas permitidas.");

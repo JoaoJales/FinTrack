@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
+use App\Models\Institution;
 use App\Services\AccountService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
+
 class AccountController extends Controller
 {
     public function __construct(
@@ -20,27 +24,27 @@ class AccountController extends Controller
     {
         $this->authorize('viewAny', Account::class);
         $accounts = $this->accountService->getAccountsByUser(auth()->id());
+        $institutions = Institution::all();
+        $accountsCount = $accounts->count();
+        $total_balance = $this->accountService->getTotalBalance($accounts);
 
-        return view('accounts.index', compact('accounts'));
+        return view('accounts.index', compact('accounts', 'institutions', 'accountsCount', 'total_balance'));
     }
 
     public function create()  //View criar contas
     {
         $this->authorize('create', Account::class);
-
-        // Apenas busca todos os bancos. Não precisa de policy e controller para institutions.
-//        $institutions = Institution::all();
-//
-//        return view('accounts.create', compact('institutions'));
-
         return view('accounts.create');
     }
 
     public function store(StoreAccountRequest $request)
     {
-        $this->accountService->store($request->validated(), auth()->id());
-
-        return to_route('accounts.index')->with('success', 'Conta criada com sucesso!');
+        try {
+            $this->accountService->store($request->validated(), auth()->id());
+            return to_route('accounts.index')->with('success', 'Conta criada com sucesso!');
+        } catch (InvalidArgumentException $e) {
+            return to_route('accounts.index')->with('error', $e->getMessage());
+        }
     }
 
     public function show(Account $account)
@@ -59,16 +63,23 @@ class AccountController extends Controller
 
     public function update(UpdateAccountRequest $request, Account $account)
     {
-        $this->accountService->update($account, $request->validated());
-        return to_route('accounts.index')->with('success', 'Conta atualizada com sucesso!');
+        try {
+            $this->accountService->update($account, $request->validated());
+            return to_route('accounts.index')->with('success', 'Conta atualizada com sucesso!');
+        } catch (InvalidArgumentException $e) {
+            return to_route('accounts.index')->with('error', $e->getMessage());
+        }
     }
 
     public function destroy(Account $account)
     {
         $this->authorize('delete', $account);
-        $this->accountService->destroy($account);
-
-        return to_route('accounts.index')->with('success', 'Conta deletada com sucesso!');
+        try {
+            $this->accountService->destroy($account);
+            return to_route('accounts.index')->with('success', 'Conta excluída com sucesso!');
+        } catch (InvalidArgumentException $e) {
+            return to_route('accounts.index')->with('error', $e->getMessage());
+        }
     }
 
 }

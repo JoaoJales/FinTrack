@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Enums\AccountType;
+use App\Helpers\FormatHelper;
 use App\Rules\CheckAccountLimit;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -15,6 +17,15 @@ class StoreAccountRequest extends FormRequest
     public function authorize(): bool
     {
         return auth()->check();
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->initial_balance) {
+            $this->merge([
+                'initial_balance' => FormatHelper::brToUS($this->initial_balance),
+            ]);
+        }
     }
 
     /**
@@ -29,16 +40,17 @@ class StoreAccountRequest extends FormRequest
             'initial_balance' => ['required', 'numeric', 'min:0'],
             'account_type' => ['required', new Enum(AccountType::class)],
             'institution_id' => ['required', 'exists:institutions,id'],
+            'is_default' => ['nullable', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'Campo obrigatório',
-            'initial_balance.required' => 'Campo obrigatório',
-            'account_type.required' => 'Campo obrigatório',
-            'institution_id.required' => 'Campo obrigatório',
+            'name.required' => 'Campo (Nome) é obrigatório',
+            'initial_balance.required' => 'Campo (Saldo inicial) é obrigatório',
+            'account_type.required' => 'Campo (Tipo de conta) é obrigatório',
+            'institution_id.required' => 'Campo Banco é obrigatório',
         ];
     }
 }

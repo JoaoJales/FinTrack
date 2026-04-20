@@ -28,15 +28,16 @@ class UpdateAccountRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'account_type' => ['required', new Enum(AccountType::class)],
             'institution_id' => ['required', 'exists:institutions,id'],
+            'is_default' => ['nullable']
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'Campo obrigatório',
-            'account_type.required' => 'Campo obrigatório',
-            'institution_id.required' => 'Campo obrigatório',
+            'name.required' => 'Campo (Nome) é obrigatório',
+            'account_type.required' => 'Campo (Tipo de Conta) é obrigatório',
+            'institution_id.required' => 'Campo (Banco) é obrigatório'
         ];
     }
 }
