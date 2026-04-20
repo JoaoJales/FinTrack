@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TransactionType;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Transaction;
@@ -24,16 +25,49 @@ class TransactionController extends Controller
         $this->authorize('viewAny', Transaction::class);
         $transactions = $this->transactionService->getAllByUser(auth()->id());
 
-        return view('transactions.index', compact('transactions'));
+        $accounts = $this->accountService->getAccountsByUser(auth()->id());
+        $defaultAccount = $accounts->firstWhere('is_default', true);
+
+        $categories = $this->categoryService->getAllByUser(auth()->id())->sortBy('id');
+        $categoriesByType = $categories->groupBy('type');
+
+        $defaultExpenseCategory = $categoriesByType->get(TransactionType::EXPENSE->value)?->sortBy('id')->first();
+        $defaultIncomeCategory  = $categoriesByType->get(TransactionType::INCOME->value)?->sortBy('id')->first();
+
+        $defaultAccountData = [
+            'id'    => $defaultAccount?->id,
+            'name'  => $defaultAccount?->name,
+            'image' => $defaultAccount?->institution?->image,
+            'color' => $defaultAccount?->institution?->color ?? '#6B7280',
+        ];
+
+        $defaultExpenseCategoryData = [
+            'id'    => $defaultExpenseCategory?->id,
+            'name'  => $defaultExpenseCategory?->name,
+            'icon'  => $defaultExpenseCategory?->icon ?? 'bx bx-category',
+            'color' => $defaultExpenseCategory?->color ?? '#5c5e5c',
+        ];
+
+        return view('transaction.index', compact(
+            'transactions',
+            'categories',
+            'accounts',
+            'defaultAccount',
+            'categoriesByType',
+            'defaultExpenseCategory',
+            'defaultIncomeCategory',
+            'defaultAccountData',
+            'defaultExpenseCategoryData',
+            )
+        );
     }
+
 
     public function create()
     {
         $this->authorize('create', Transaction::class);
-        $accounts = $this->accountService->getAccountsByUser(auth()->id());
-        $categories = $this->categoryService->getAllByUser(auth()->id());
 
-        return view('transactions.create', compact('accounts', 'categories'));
+        return view('transaction.create');
     }
 
     public function store(StoreTransactionRequest $request)

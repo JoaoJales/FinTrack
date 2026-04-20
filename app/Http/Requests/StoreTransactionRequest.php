@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\FormatHelper;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTransactionRequest extends FormRequest
@@ -12,6 +14,21 @@ class StoreTransactionRequest extends FormRequest
     public function authorize(): bool
     {
         return auth()->check(); //Voltar aqui...
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->amount) {
+            $this->merge([
+                'amount' => FormatHelper::brToUS($this->amount),
+            ]);
+        }
+
+        if ($this->date) {
+            $this->merge([
+                'date' => Carbon::createFromFormat('d/m/Y', $this->date)->format('Y-m-d'),
+            ]);
+        }
     }
 
     /**
@@ -33,7 +50,7 @@ class StoreTransactionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'amount.required' => 'Campo obrigatório',
+            'amount.required' => 'Campo (Valor) é obrigatório',
             'category_id.required' => 'Campo obrigatório',
         ];
     }

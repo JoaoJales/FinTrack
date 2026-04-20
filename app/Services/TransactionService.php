@@ -5,17 +5,18 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class TransactionService
 {
-    public function getAllByUser(int $userId): Collection
+    public function getAllByUser(int $userId, int $perPage = 15): LengthAwarePaginator
     {
         return Transaction::where('user_id', $userId)
             ->with(['category', 'account'])
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')   // Desempate: se tiverem a mesma data, a última criada aparece primeiro
-            ->get();
+            ->paginate($perPage)->withQueryString();
     }
 
     public function store(array $request, int $userId): Transaction
