@@ -17,7 +17,7 @@ class DashboardController
     {
         $data = $this->dashboardService->getDashboardData(auth()->id());
 
-        return \view('dashboard', $data);
+        return \view('dashboard.index', $data);
     }
 
 }

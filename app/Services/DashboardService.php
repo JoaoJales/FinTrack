@@ -15,21 +15,16 @@ class DashboardService
 
     public function getDashboardData(int $userId): array
     {
-        $accounts = $this->getAccountsWithBalance($userId);
+        $accounts = $this->accountService->getAccountsByUser($userId);
         $transactions = $this->getLastTransactions($userId);
 
         return [
             'accounts' => $accounts,
-            'total_balance' => $this->getTotalBalance($accounts),
+            'total_balance' => $this->accountService->getTotalBalance($accounts),
             'last_transactions' => $transactions,
             'expenses_by_category' => $this->getExpensesByCategory($userId),
             'month_performace' => $this->getCurrentMonthPerformance($userId),
         ];
-    }
-
-    private function getAccountsWithBalance(int $userId): Collection
-    {
-        return $this->accountService->getAccountsByUser($userId);
     }
 
     private function getLastTransactions(int $userId): Collection
@@ -38,14 +33,11 @@ class DashboardService
         ->with(['category', 'account'])
         ->orderBy('date', 'desc')
         ->orderBy('id', 'desc')
-        ->limit(10)
+        ->limit(5)
         ->get();
     }
 
-    private function getTotalBalance(Collection $accounts): float
-    {
-        return (float) $accounts->sum('current_balance');
-    }
+
 
     private function getExpensesByCategory(int $userId): Collection
     {
@@ -70,6 +62,24 @@ class DashboardService
                 SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
             ")
             ->first();
+    }
+
+    /**
+     * Retorna entradas e saídas dos últimos 6 meses.
+     */
+    private function getMonthlyPerformance(int $userId): Collection
+    {
+        return Transaction::where('transactions.user_id', $userId)
+            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->where('transactions.date', '>=', now()->subMonths(6)->startOfMonth())
+            ->selectRaw("
+                DATE_FORMAT(transactions.date, '%Y-%m') as month,
+                SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
+                SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
+            ")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
     }
 
 
