@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('account_type');
             $table->decimal('initial_balance', 12, 2)->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
