@@ -25,9 +25,13 @@
                     <div class="">
                         <p class="text-sm font-medium text-gray-500 mb-1">Saldo Total</p>
                         <h3 class="text-3xl font-bold text-gray-900">R$ @moneyBr($total_balance)</h3>
-                        <div class="flex items-center mt-2 text-blue-600 font-medium">
-                            <i class="bx bx-trending-up mr-1"></i>
-                            +12% este mês {{-- TODO: calcular variação real --}}
+                        <div class="flex items-center mt-2 font-medium
+                            {{ $balance_variation['positive'] ? 'text-emerald-600' : 'text-rose-600' }}">
+
+                            @if($balance_variation['percentage'] !== null)
+                                <i class="bx {{ $balance_variation['positive'] ? 'bx-trending-up' : 'bx-trending-down' }} mr-1"></i>
+                                {{ $balance_variation['positive'] ? '+' : '-' }}{{ $balance_variation['percentage'] }}% Vs {{ now()->subMonth()->translatedFormat('F') }}
+                            @endif
                         </div>
                     </div>
                     <div>
@@ -125,92 +129,169 @@
                     </x-table>
                 </x-table-scroll>
             </x-card>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {{-- Gastos/Ganhos por Categoria --}}
+                <x-card class="w-full" x-data="{tab: 'expense'}">
+                    @php
+                        // Expenses
+                        $totalExpenses      = $expenses_by_category->sum('total');
+                        $expenseLabels      = $expenses_by_category->pluck('name')->toArray();
+                        $expenseColors      = $expenses_by_category->pluck('color')->toArray();
+                        $expenseAmounts     = $expenses_by_category->pluck('total')->toArray();
+                        $expensePercentages = $expenses_by_category->map(fn($c) => $totalExpenses > 0 ? round(($c->total / $totalExpenses) * 100) : 0)->toArray();
 
-            <!-- Gastos por Categoria  -->
-            <x-card class="max-w-[60vh]">
-                @php
-                    // Calcula o total de gastos para calcular percentuais
-                    $totalExpenses = $expenses_by_category->sum('total');
+                        if (empty($expenseLabels)) {
+                            $expenseLabels      = ['Sem dados'];
+                            $expenseColors      = ['#e5e7eb'];
+                            $expenseAmounts     = [0];
+                            $expensePercentages = [100];
+                        }
 
-                    // Paleta de cores para as categorias (ordem: 1ª, 2ª, 3ª...)
-                    $categoryColors = [
-                        'bg-amber-400', 'bg-cyan-400', 'bg-indigo-500',
-                        'bg-orange-600', 'bg-blue-500', 'bg-gray-400',
-                    ];
-                @endphp
+                        // Incomes
+                        $totalIncomes      = $incomes_by_category->sum('total');
+                        $incomeLabels      = $incomes_by_category->pluck('name')->toArray();
+                        $incomeColors      = $incomes_by_category->pluck('color')->toArray();
+                        $incomeAmounts     = $incomes_by_category->pluck('total')->toArray();
+                        $incomePercentages = $incomes_by_category->map(fn($c) => $totalIncomes > 0 ? round(($c->total / $totalIncomes) * 100) : 0)->toArray();
 
-                <div class="flex justify-between items-center mb-4">
-                    <div class="">
-                        <h2 class="text-lg font-bold text-gray-800">Gastos por categoria</h2>
-                        <x-link href="{{ route('categories.index') }}">Ver minhas categorias</x-link>
-                    </div>
-                    <div class="flex bg-gray-100 rounded-lg p-1">
-                        <button class="p-1.5 rounded-md bg-white shadow-sm text-gray-700">
-                            <i class="bx bx-trending-down"></i> <!-- VERIFICAR O ICON -->
-                        </button>
-                        <button class="p-1.5 rounded-md text-gray-500 hover:text-gray-700">
-                            <i class="bx bx-trending-up"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-500">Total de gastos</p>
-                            <p class="text-2xl font-bold text-rose-600">
-                                R$ @moneyBr($totalExpenses)
-                            </p>
+                        if (empty($incomeLabels)) {
+                            $incomeLabels      = ['Sem dados'];
+                            $incomeColors      = ['#e5e7eb'];
+                            $incomeAmounts     = [0];
+                            $incomePercentages = [100];
+                        }
+                    @endphp
+
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-800" x-text="tab === 'expense' ? 'Gastos por categoria' : 'Ganhos por categoria'"></h2>
+                            <x-link href="{{ route('categories.index') }}">Ver minhas categorias</x-link>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <!-- Legenda -->
-                            <div class="flex-1 space-y-3 min-h-[150px]">
-                                @forelse($expenses_by_category as $index => $category)
-                                    @php
-                                        $percentage = $totalExpenses > 0
-                                            ? round(($category->total / $totalExpenses) * 100)
-                                            : 0;
-                                        $colorClass = $categoryColors[$index] ?? 'bg-gray-400';
-                                    @endphp
+                        <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
+                            <button
+                                class="p-1.5 rounded-md transition-colors"
+                                :class="tab === 'expense' ? 'bg-white shadow-sm text-rose-500' : 'text-gray-400 hover:text-gray-600'"
+                                x-on:click="tab = 'expense'"
+                                title="Gastos"
+                            >
+                                <i class="bx bx-trending-down"></i>
+                            </button>
+                            <button
+                                class="p-1.5 rounded-md transition-colors"
+                                :class="tab === 'income' ? 'bg-white shadow-sm text-emerald-500' : 'text-gray-400 hover:text-gray-600'"
+                                x-on:click="tab = 'income'"
+                                title="Ganhos"
+                            >
+                                <i class="bx bx-trending-up"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">
+                                    <span x-show="tab === 'expense'">Total de gastos</span>
+                                    <span x-show="tab === 'income'">Total de ganhos</span>
+                                </p>
+                                <p x-show="tab === 'expense'" class="text-2xl font-bold text-rose-600">
+                                    R$ @moneyBr($totalExpenses)
+                                </p>
+                                <p x-show="tab === 'income'" class="text-2xl font-bold text-emerald-600">
+                                    R$ @moneyBr($totalIncomes)
+                                </p>
+                            </div>
+
+                            {{-- Legenda Gastos --}}
+                            <div x-show="tab === 'expense'" class="space-y-3 min-h-[150px]">
+                                @forelse($expenses_by_category as $category)
+                                    @php $pct = $totalExpenses > 0 ? round(($category->total / $totalExpenses) * 100) : 0; @endphp
                                     <div class="flex items-center gap-3">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-3 h-3 rounded-full {{ $colorClass }}"></div>
+                                            <div class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $category->color ?? '#e5e7eb' }}"></div>
                                             <span class="text-sm text-gray-700">{{ $category->name }}</span>
                                         </div>
-                                        <span class="text-sm font-semibold text-gray-900">({{ $percentage }}%)</span>
+                                        <span class="text-sm font-semibold text-gray-900">({{ $pct }}%)</span>
                                     </div>
                                 @empty
-                                    <div class="mt-8 flex w-1/3 items-center justify-center bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                                        <p class="text-sm text-gray-400">Sem gastos registrados este mês.</p>
+                                    <p class="text-sm text-gray-400 mt-4">Sem gastos registrados este mês.</p>
+                                @endforelse
+                            </div>
+
+                            {{-- Legenda Ganhos --}}
+                            <div x-show="tab === 'income'" class="space-y-3 min-h-[150px]">
+                                @forelse($incomes_by_category as $category)
+                                    @php $pct = $totalIncomes > 0 ? round(($category->total / $totalIncomes) * 100) : 0; @endphp
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $category->color ?? '#e5e7eb' }}"></div>
+                                            <span class="text-sm text-gray-700">{{ $category->name }}</span>
+                                        </div>
+                                        <span class="text-sm font-semibold text-gray-900">({{ $pct }}%)</span>
                                     </div>
+                                @empty
+                                    <p class="text-sm text-gray-400 mt-4">Sem ganhos registrados este mês.</p>
                                 @endforelse
                             </div>
                         </div>
-                    </div>
-                    <!-- Donut Chart -->
-                    @php
-                        // Monta arrays para o componente do gráfico
-                        $chartLabels = $expenses_by_category->pluck('name')->toArray();
-                        $chartData = $expenses_by_category->map(function ($cat) use ($totalExpenses) {
-                            return $totalExpenses > 0
-                                ? round(($cat->total / $totalExpenses) * 100)
-                                : 0;
-                        })->toArray();
 
-                        // Fallback se não houver dados
-                        if (empty($chartLabels)) {
-                            $chartLabels = ['Sem dados'];
-                            $chartData   = [100];
-                        }
-                    @endphp
-                    <div class="w-40 flex items-center justify-center">
-                        <x-charts.category-donut
-                            id="chartCategorias"
-                            :labels="$chartLabels"
-                            :data="$chartData">
-                        </x-charts.category-donut>
+                        {{-- Charts --}}
+                        <div class="w-40 flex items-center justify-center">
+                            <div x-show="tab === 'expense'">
+                                <x-charts.category-donut
+                                    id="chartGastos"
+                                    :labels="$expenseLabels"
+                                    :data="$expensePercentages"
+                                    :colors="$expenseColors"
+                                    :amounts="$expenseAmounts"
+                                />
+                            </div>
+                            <div x-show="tab === 'income'">
+                                <x-charts.category-donut
+                                    id="chartGanhos"
+                                    :labels="$incomeLabels"
+                                    :data="$incomePercentages"
+                                    :colors="$incomeColors"
+                                    :amounts="$incomeAmounts"
+                                />
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </x-card>
+                </x-card>
+
+                <x-card class="w-full">
+                    @php
+                        $barMonths  = $monthly_performance->pluck('month')
+                            ->map(fn($m) => \Carbon\Carbon::createFromFormat('Y-m', $m)->translatedFormat('M/y'))
+                            ->toArray();
+                        $barIncome  = $monthly_performance->pluck('total_income')->map(fn($v) => round($v, 2))->toArray();
+                        $barExpense = $monthly_performance->pluck('total_expense')->map(fn($v) => round($v, 2))->toArray();
+                    @endphp
+
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-800">Evolução mensal</h2>
+                            <p class="text-sm text-gray-400">Últimos 6 meses</p>
+                        </div>
+                    </div>
+
+                    @if($monthly_performance->isEmpty())
+                        <div class="flex flex-col items-center justify-center min-h-[200px] gap-2 text-center">
+                            <i class="bx bx-bar-chart-alt-2 text-4xl text-gray-200"></i>
+                            <p class="text-sm text-gray-400">Sem transações nos últimos 6 meses.</p>
+                        </div>
+                    @else
+                        <x-charts.monthly-bars
+                            id="chartEvolucao"
+                            :months="$barMonths"
+                            :income="$barIncome"
+                            :expense="$barExpense"
+                        />
+                    @endif
+                </x-card>
+            </div>
+
+
         </div>
 
         <!-- Coluna Direita (4 cols) -->

@@ -2,7 +2,8 @@
     'id' => 'chart-' . uniqid(),
     'labels' => [],
     'data' => [],
-    'colors' => ['#fbbf24', '#22d3ee', '#6366f1', '#ea580c', '#3b82f6', '#e5e7eb']
+    'amounts' => [],
+    'colors' => []
 ])
 
 <div
@@ -39,13 +40,36 @@
                                 show: true,
                                 fontSize: '10px',
                                 color: '#9ca3af',
-                                formatter: () => 'Março'
+                                formatter: () => '{{ now()->translatedFormat('F') }}'
                             }
                         }
                     }
                 }
             },
-            tooltip: { enabled: true }
+            tooltip: {
+                enabled: true,
+                custom: function({ seriesIndex, w }) {
+                    const amounts = {{ json_encode($amounts) }};
+                    const label   = w.globals.labels[seriesIndex];
+                    const pct     = w.globals.series[seriesIndex];
+                    const color   = w.globals.colors[seriesIndex];
+
+                    const value = amounts.length > 0
+                        ? 'R$ ' + Number(amounts[seriesIndex]).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        : pct + '%';
+
+                    return `
+                        <div style='padding: 8px 12px; font-size: 12px; font-family: inherit; background: #fff;'>
+                            <div style='display: flex; align-items: center; gap: 6px; margin-bottom: 2px;'>
+                                <span style='display:inline-block; width:10px; height:10px; border-radius:50%; background:${color};'></span>
+                                <span style='color: #374151; font-weight: 600;'>${label}</span>
+                            </div>
+                            <div style='color: #111827; font-weight: 700; font-size: 13px; padding-left: 16px;'>${value}</div>
+                            <div style='color: #9ca3af; font-size: 11px; padding-left: 16px;'>${pct}% do total</div>
+                        </div>
+                    `;
+                }
+            }
         }).render()
     "
 >
