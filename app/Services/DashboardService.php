@@ -9,9 +9,7 @@ class DashboardService
 {
     public function __construct(
         private AccountService $accountService
-    )
-    {
-    }
+    ) {}
 
     public function getDashboardData(int $userId): array
     {
@@ -21,10 +19,10 @@ class DashboardService
         return [
             'accounts' => $accounts,
             'total_balance' => $this->accountService->getTotalBalance($accounts),
-            'balance_variation'    => $this->getBalanceVariation($userId),
+            'balance_variation' => $this->getBalanceVariation($userId),
             'last_transactions' => $transactions,
-            'expenses_by_category'  => $this->getByCategory($userId, 'expense'),
-            'incomes_by_category'   => $this->getByCategory($userId, 'income'),
+            'expenses_by_category' => $this->getByCategory($userId, 'expense'),
+            'incomes_by_category' => $this->getByCategory($userId, 'income'),
             'month_performace' => $this->getCurrentMonthPerformance($userId),
             'monthly_performance' => $this->getMonthlyPerformance($userId),
         ];
@@ -33,14 +31,12 @@ class DashboardService
     private function getLastTransactions(int $userId): Collection
     {
         return Transaction::where('user_id', $userId)
-        ->with(['category', 'account'])
-        ->orderBy('date', 'desc')
-        ->orderBy('id', 'desc')
-        ->limit(5)
-        ->get();
+            ->with(['category', 'account'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->limit(5)
+            ->get();
     }
-
-
 
     private function getByCategory(int $userId, string $type): Collection
     {
@@ -101,7 +97,7 @@ class DashboardService
 
         return [
             'percentage' => abs($percentage),
-            'positive'   => $percentage >= 0,
+            'positive' => $percentage >= 0,
         ];
     }
 
@@ -120,6 +116,4 @@ class DashboardService
 
         return (float) ($result ?? 0);
     }
-
-
 }

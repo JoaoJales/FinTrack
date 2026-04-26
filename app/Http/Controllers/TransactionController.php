@@ -17,9 +17,8 @@ class TransactionController extends Controller
         private TransactionService $transactionService,
         private AccountService $accountService,
         private CategoryService $categoryService
-    )
-    {
-    }
+    ) {}
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Transaction::class);
@@ -32,19 +31,19 @@ class TransactionController extends Controller
         $categoriesByType = $categories->groupBy('type');
 
         $defaultExpenseCategory = $categoriesByType->get(TransactionType::EXPENSE->value)?->sortBy('id')->first();
-        $defaultIncomeCategory  = $categoriesByType->get(TransactionType::INCOME->value)?->sortBy('id')->first();
+        $defaultIncomeCategory = $categoriesByType->get(TransactionType::INCOME->value)?->sortBy('id')->first();
 
         $defaultAccountData = [
-            'id'    => $defaultAccount?->id,
-            'name'  => $defaultAccount?->name,
+            'id' => $defaultAccount?->id,
+            'name' => $defaultAccount?->name,
             'image' => $defaultAccount?->institution?->image,
             'color' => $defaultAccount?->institution?->color ?? '#6B7280',
         ];
 
         $defaultExpenseCategoryData = [
-            'id'    => $defaultExpenseCategory?->id,
-            'name'  => $defaultExpenseCategory?->name,
-            'icon'  => $defaultExpenseCategory?->icon ?? 'bx bx-category',
+            'id' => $defaultExpenseCategory?->id,
+            'name' => $defaultExpenseCategory?->name,
+            'icon' => $defaultExpenseCategory?->icon ?? 'bx bx-category',
             'color' => $defaultExpenseCategory?->color ?? '#5c5e5c',
         ];
 
@@ -58,10 +57,9 @@ class TransactionController extends Controller
             'defaultIncomeCategory',
             'defaultAccountData',
             'defaultExpenseCategoryData',
-            )
+        )
         );
     }
-
 
     public function create()
     {

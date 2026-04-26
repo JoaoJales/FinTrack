@@ -7,9 +7,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-//Route::get('/', function () {
+// Route::get('/', function () {
 //    return redirect('/dashboard');
-//})->middleware(['auth', 'verified'])->name('dashboard.index');
+// })->middleware(['auth', 'verified'])->name('dashboard.index');
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.index');
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 

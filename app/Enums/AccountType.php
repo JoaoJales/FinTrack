@@ -21,9 +21,9 @@ enum AccountType: string
         return $data;
     }
 
-    public static function toSelect(array $accountType = null): array
+    public static function toSelect(?array $accountType = null): array
     {
-        $data    = [];
+        $data = [];
         $options = self::cases();
 
         if ($accountType) {
@@ -51,7 +51,8 @@ enum AccountType: string
         return $data;
     }
 
-    public function label(): string {
+    public function label(): string
+    {
         return match ($this) {
             self::CHECKING => 'Conta Corrente',
             self::SAVINGS => 'Poupança',

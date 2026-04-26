@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\AccountType;
 use App\Helpers\FormatHelper;
 use App\Rules\CheckAccountLimit;
-use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -31,12 +31,12 @@ class StoreAccountRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', new CheckAccountLimit()],
+            'name' => ['required', 'string', 'max:255', new CheckAccountLimit],
             'initial_balance' => ['required', 'numeric', 'min:0'],
             'account_type' => ['required', new Enum(AccountType::class)],
             'institution_id' => ['required', 'exists:institutions,id'],

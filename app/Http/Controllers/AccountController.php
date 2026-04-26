@@ -7,20 +7,15 @@ use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use App\Models\Institution;
 use App\Services\AccountService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 class AccountController extends Controller
 {
     public function __construct(
         private AccountService $accountService,
-    )
-    {
+    ) {}
 
-    }
-
-    public function index() //View Exibir contas
+    public function index() // View Exibir contas
     {
         $this->authorize('viewAny', Account::class);
         $accounts = $this->accountService->getAccountsByUser(auth()->id());
@@ -31,9 +26,10 @@ class AccountController extends Controller
         return view('accounts.index', compact('accounts', 'institutions', 'accountsCount', 'total_balance'));
     }
 
-    public function create()  //View criar contas
+    public function create()  // View criar contas
     {
         $this->authorize('create', Account::class);
+
         return view('accounts.create');
     }
 
@@ -41,6 +37,7 @@ class AccountController extends Controller
     {
         try {
             $this->accountService->store($request->validated(), auth()->id());
+
             return to_route('accounts.index')->with('success', 'Conta criada com sucesso!');
         } catch (InvalidArgumentException $e) {
             return to_route('accounts.index')->with('error', $e->getMessage());
@@ -65,6 +62,7 @@ class AccountController extends Controller
     {
         try {
             $this->accountService->update($account, $request->validated());
+
             return to_route('accounts.index')->with('success', 'Conta atualizada com sucesso!');
         } catch (InvalidArgumentException $e) {
             return to_route('accounts.index')->with('error', $e->getMessage());
@@ -76,10 +74,10 @@ class AccountController extends Controller
         $this->authorize('delete', $account);
         try {
             $this->accountService->destroy($account);
+
             return to_route('accounts.index')->with('success', 'Conta excluída com sucesso!');
         } catch (InvalidArgumentException $e) {
             return to_route('accounts.index')->with('error', $e->getMessage());
         }
     }
-
 }

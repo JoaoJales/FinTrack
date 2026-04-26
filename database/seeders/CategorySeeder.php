@@ -23,8 +23,6 @@ class CategorySeeder extends Seeder
             ['name' => 'Dívidas', 'type' => 'expense', 'icon' => 'bx bx-receipt', 'color' => '#C0392B'],
             ['name' => 'Outros (gastos)', 'type' => 'expense', 'icon' => 'bx bx-dots-horizontal-rounded', 'color' => '#7F8C8D'],
 
-
-
             // RECEITAS (Income)
             ['name' => 'Salário', 'type' => 'income', 'icon' => 'bx bx-money', 'color' => '#2ECC71'],
             ['name' => 'Rendimentos', 'type' => 'income', 'icon' => 'bx bx-trending-up', 'color' => '#3A79F0'],
@@ -40,12 +38,12 @@ class CategorySeeder extends Seeder
                 [
                     'name' => $category['name'],
                     'type' => $category['type'],
-                    'user_id' => null // Categoria Global (do sistema)
+                    'user_id' => null, // Categoria Global (do sistema)
                 ],
                 [
                     'icon' => $category['icon'],
                     'color' => $category['color'],
-                    'is_editable' => false // Trava para edição
+                    'is_editable' => false, // Trava para edição
                 ]
             );
         }

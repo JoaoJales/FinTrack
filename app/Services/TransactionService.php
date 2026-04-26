@@ -11,7 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TransactionService
 {
-    public function getAllByUser(int $userId, ?Request $request = null ,int $perPage = 15): LengthAwarePaginator
+    public function getAllByUser(int $userId, ?Request $request = null, int $perPage = 15): LengthAwarePaginator
     {
         $query = Transaction::where('transactions.user_id', $userId)
             ->with(['category', 'account.institution'])
@@ -39,7 +39,7 @@ class TransactionService
             if ($month = $request->month) {
                 $date = Carbon::createFromFormat('Y-m', $month);
                 $query->whereMonth('transactions.date', $date->month)
-                    ->whereYear('transactions.date',  $date->year);
+                    ->whereYear('transactions.date', $date->year);
             } else {
                 if ($dateStart = $request->date_start) {
                     $query->where('transactions.date', '>=', $dateStart);
@@ -63,11 +63,11 @@ class TransactionService
             ->paginate($perPage)
             ->withQueryString();
 
-//        return Transaction::where('user_id', $userId)
-//            ->with(['category', 'account'])
-//            ->orderBy('date', 'desc')
-//            ->orderBy('id', 'desc')   // Desempate: se tiverem a mesma data, a última criada aparece primeiro
-//            ->paginate($perPage)->withQueryString();
+        //        return Transaction::where('user_id', $userId)
+        //            ->with(['category', 'account'])
+        //            ->orderBy('date', 'desc')
+        //            ->orderBy('id', 'desc')   // Desempate: se tiverem a mesma data, a última criada aparece primeiro
+        //            ->paginate($perPage)->withQueryString();
     }
 
     public function store(array $request, int $userId): Transaction
@@ -79,19 +79,18 @@ class TransactionService
             ->where('user_id', $userId)
             ->exists();
 
-        if (!$accountBelongsToUser) {
+        if (! $accountBelongsToUser) {
             abort(403);
         }
 
         $categoryBelongsToUser = Category::where('id', $request['category_id'])
             ->where(function ($query) use ($userId) {
-               $query->where('user_id', $userId) //Categorias do user
-                   ->orWhere('is_editable', false); //Ou Globais
+                $query->where('user_id', $userId) // Categorias do user
+                    ->orWhere('is_editable', false); // Ou Globais
             })
             ->exists();
 
-
-        if (!$categoryBelongsToUser) {
+        if (! $categoryBelongsToUser) {
             abort(403);
         }
 
@@ -102,7 +101,7 @@ class TransactionService
     {
         $transaction->update($request);
 
-//        return $transaction->fresh();
+        //        return $transaction->fresh();
     }
 
     public function destroy(Transaction $transaction): void

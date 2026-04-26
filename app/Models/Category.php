@@ -16,13 +16,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $icon Ícone opcional da Categoria
  * @property string $color Cor opcional da Categoria
  * @property TransactionType $type Tipo da transação (Ganho e Gasto)
- * @property boolean $is_editable Diferencia se a categoria é global ou criada pelo usuário
+ * @property bool $is_editable Diferencia se a categoria é global ou criada pelo usuário
  */
 class Category extends Model
 {
     use SoftDeletes;
 
     protected $table = 'categories';
+
     protected $fillable = [
         'name',
         'user_id',
@@ -41,11 +42,13 @@ class Category extends Model
         'is_editable' => 'boolean',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function transactions(): HasMany {
+    public function transactions(): HasMany
+    {
         return $this->hasMany(Transaction::class);
     }
 }

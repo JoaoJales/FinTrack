@@ -18,17 +18,20 @@ class Institution extends Model
     use SoftDeletes;
 
     public $table = 'institutions';
+
     protected $fillable = [
         'name',
         'image',
-        'color'
+        'color',
     ];
+
     protected $casts = [
         'name' => 'string',
         'color' => 'string',
     ];
 
-    public function accounts(): HasMany {
+    public function accounts(): HasMany
+    {
         return $this->hasMany(Account::class);
     }
 }

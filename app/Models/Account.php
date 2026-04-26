@@ -15,28 +15,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $user_id Usuário
  * @property int $institution_id Instituição Financeira
  * @property string $name Apelido para Conta
- * @property double $initial_balance Saldo Inicial
+ * @property float $initial_balance Saldo Inicial
  * @property AccountType $account_type Tipo de Conta (Corretente, Carteira, Poupança, Investimento, etc)
  * @property float $current_balance Saldo Atual (virtual — calculado via transações)
  */
 class Account extends Model
 {
     public $table = 'accounts';
+
     protected $fillable = [
         'user_id',
         'institution_id',
         'name',
         'initial_balance',
         'account_type',
-        'is_default'
+        'is_default',
     ];
+
     protected $casts = [
         'user_id' => 'integer',
         'institution_id' => 'integer',
         'name' => 'string',
         'initial_balance' => 'decimal:2',
         'account_type' => AccountType::class,
-        'is_default' => 'boolean'
+        'is_default' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -44,11 +46,13 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function institution(): BelongsTo {
+    public function institution(): BelongsTo
+    {
         return $this->belongsTo(Institution::class);
     }
 
-    public function transactions(): HasMany {
+    public function transactions(): HasMany
+    {
         return $this->hasMany(Transaction::class);
     }
 
@@ -63,7 +67,7 @@ class Account extends Model
      */
     protected function currentBalance(): Attribute
     {
-        //O selectRaw() permite escrever SQL puro dentro da query do Eloquent.
+        // O selectRaw() permite escrever SQL puro dentro da query do Eloquent.
         return Attribute::make(
             get: function () {
                 $transactions = $this->transactions()
@@ -74,9 +78,9 @@ class Account extends Model
                     ")
                     ->first();
 
-                return (float)$this->initial_balance
-                    + (float)($transactions->total_income ?? 0)
-                    - (float)($transactions->total_expense ?? 0);
+                return (float) $this->initial_balance
+                    + (float) ($transactions->total_income ?? 0)
+                    - (float) ($transactions->total_expense ?? 0);
             }
         );
     }

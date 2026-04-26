@@ -11,9 +11,8 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function __construct(private CategoryService $categoryService)
-    {
-    }
+    public function __construct(private CategoryService $categoryService) {}
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Category::class);
@@ -25,12 +24,14 @@ class CategoryController extends Controller
     public function create()
     {
         $this->authorize('create', Category::class);
+
         return view('categories.create');
     }
 
     public function store(StoreCategoryRequest $request)
     {
         $this->categoryService->store($request->validated(), auth()->id());
+
         return to_route('categories.index')->with('success', 'Categoria criada com sucesso!.');
     }
 
@@ -44,6 +45,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $this->authorize('update', $category);
+
         return view('categories.edit', compact('category'));
     }
 
@@ -59,6 +61,7 @@ class CategoryController extends Controller
         $this->authorize('delete', $category);
 
         $this->categoryService->destroy($category);
+
         return to_route('categories.index')->with('success', 'Categoria removida com sucesso!');
     }
 }

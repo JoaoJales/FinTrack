@@ -36,6 +36,9 @@ O sistema é composto pelas seguintes entidades principais:
 
 ---
 
+### Pint: `./vendor/bin/pint`
+
+---
 ## 📦 Como rodar o projeto localmente
 
 ### Pré-requisitos

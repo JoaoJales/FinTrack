@@ -4,15 +4,14 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 
 class CategoryService
 {
     public function getAllByUser(int $userId): Collection
     {
-        return Category::whereNull('user_id') //Não precisamos verificar as deletadas (softDelete já faz o filtro)
-            ->orWhere('user_id', $userId) //orWhere: Busca as globais e as do user -> O resultado final é uma lista única contendo as duas coisas juntas.
+        return Category::whereNull('user_id') // Não precisamos verificar as deletadas (softDelete já faz o filtro)
+            ->orWhere('user_id', $userId) // orWhere: Busca as globais e as do user -> O resultado final é uma lista única contendo as duas coisas juntas.
             ->orderBy('is_editable', 'desc')
             ->get();
     }
@@ -46,13 +45,11 @@ class CategoryService
 
         $category->update($request);
 
-//        return $category->fresh();
+        //        return $category->fresh();
     }
 
     public function destroy(Category $category): void
     {
         $category->delete();
     }
-
-
 }

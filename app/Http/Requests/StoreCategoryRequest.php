@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\AccountType;
 use App\Enums\TransactionType;
 use App\Rules\CheckCategoryLimit;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -15,18 +15,18 @@ class StoreCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check(); //Voltar aqui...
+        return auth()->check(); // Voltar aqui...
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', new CheckCategoryLimit()],
+            'name' => ['required', 'string', 'max:255', new CheckCategoryLimit],
             'type' => ['required', new Enum(TransactionType::class)],
             'color' => ['required', 'string'],
             'icon' => ['required', 'string'],

@@ -17,7 +17,7 @@ class FormatHelper
     public static function formatCnpjCpf(string $value): string
     {
         $CPF_LENGTH = 11;
-        $cnpj_cpf   = FormatHelper::onlyNumbers($value); //preg_replace("/\D/", '', $value);
+        $cnpj_cpf = FormatHelper::onlyNumbers($value); // preg_replace("/\D/", '', $value);
 
         if (strlen($cnpj_cpf) === $CPF_LENGTH) {
             $cnpj_cpf = FormatHelper::completeWithZeros($value, 11);
@@ -33,7 +33,7 @@ class FormatHelper
     public static function formatFone(string $value): string
     {
         $FONE_LENGTH = 11;
-        $fone        = FormatHelper::onlyNumbers($value); //preg_replace("/\D/", '', $value);
+        $fone = FormatHelper::onlyNumbers($value); // preg_replace("/\D/", '', $value);
 
         if (strlen($fone) === $FONE_LENGTH) {
             return preg_replace("/(\d{2})(\d{5})(\d{4})/", '($1) $2-$3', $fone);

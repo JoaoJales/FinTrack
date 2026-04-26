@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Helpers\FormatHelper;
 use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTransactionRequest extends FormRequest
@@ -14,6 +15,7 @@ class UpdateTransactionRequest extends FormRequest
     public function authorize(): bool
     {
         $transaction = $this->route('transaction');
+
         return $transaction && $this->user()->can('update', $transaction);
     }
 
@@ -35,7 +37,7 @@ class UpdateTransactionRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -44,7 +46,7 @@ class UpdateTransactionRequest extends FormRequest
             'category_id' => ['required', 'exists:categories,id'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'description' => ['nullable', 'string', 'max:255'],
-            'date' => ['nullable' ,'date'],
+            'date' => ['nullable', 'date'],
         ];
     }
 

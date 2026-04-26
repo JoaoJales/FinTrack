@@ -11,13 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id Usuário
  * @property int $account_id Conta Bancária
  * @property int $category_id Categoria
- * @property double $amount Valor da Transação
+ * @property float $amount Valor da Transação
  * @property $date Data da Transação
  * @property string $description Descrição
  */
 class Transaction extends Model
 {
     protected $table = 'transactions';
+
     protected $fillable = [
         'user_id',
         'account_id',
@@ -36,17 +37,18 @@ class Transaction extends Model
         'description' => 'string',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo {
+    public function category(): BelongsTo
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function account(): BelongsTo {
+    public function account(): BelongsTo
+    {
         return $this->belongsTo(Account::class);
     }
-
-
 }

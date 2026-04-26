@@ -9,9 +9,7 @@ class DashboardController
 {
     public function __construct(
         private DashboardService $dashboardService
-    )
-    {
-    }
+    ) {}
 
     public function index(): View
     {
@@ -19,5 +17,4 @@ class DashboardController
 
         return \view('dashboard.index', $data);
     }
-
 }
