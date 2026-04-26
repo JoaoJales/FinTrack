@@ -20,10 +20,10 @@ class TransactionController extends Controller
     )
     {
     }
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Transaction::class);
-        $transactions = $this->transactionService->getAllByUser(auth()->id());
+        $transactions = $this->transactionService->getAllByUser(auth()->id(), $request);
 
         $accounts = $this->accountService->getAccountsByUser(auth()->id());
         $defaultAccount = $accounts->firstWhere('is_default', true);

@@ -1,6 +1,16 @@
 <x-app-layout>
     <div x-data='{
-        filters: { search: "", category: "", type: "", start_date: "", end_date: "" },
+            filters: {
+            search:     "{{ request('search') }}",
+            account:    "{{ request('account_id') }}",
+            category:   "{{ request('category_id') }}",
+            type:       "{{ request('type') }}",
+            month:      "{{ request('month') }}",
+            date_start: "{{ request('date_start') }}",
+            date_end:   "{{ request('date_end') }}",
+            amount_min: "{{ request('amount_min') }}",
+            amount_max: "{{ request('amount_max') }}",
+        },
         selectedAccount: @json($defaultAccountData),
         selectedCategory: @json($defaultExpenseCategoryData),
         defaultExpenseCategory: @json($defaultExpenseCategory),
@@ -47,62 +57,108 @@
          x-on:open-edit-transaction.window="openEditModal($event.detail)"
     >
 
-        <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Extrato</h1>
                 <p class="text-gray-500 mt-1">Gerencie suas receitas e despesas</p>
             </div>
-{{--            <a href="{{ route('transactions.create') }}">--}}
-                <x-button-primary class="py-2 px-5 gap-2" x-on:click="resetForm(); $dispatch('open-modal', 'nova-transacao')">
-                    <i class="bx bx-plus text-xl"></i>
-                    <span class="text-base">Nova Transação</span>
-                </x-button-primary>
-{{--            </a>--}}
+            <x-button-primary class="py-2 px-5 gap-2" x-on:click="resetForm(); $dispatch('open-modal', 'nova-transacao')">
+                <i class="bx bx-plus text-xl"></i>
+                <span class="text-base">Nova Transação</span>
+            </x-button-primary>
         </div>
 
         <div class="p-5 rounded-2xl border border-gray-100 shadow-lg mb-6 bg-gray-100">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="text-lg font-bold text-gray-800">Filtros</h4>
-                <x-button-outline
-                    @click="filters = { search: '', category: '', type: '', start_date: '', end_date: '' }; window.location.href='{{ route('transactions.index') }}'">
+                <x-button-outline @click="filters = { search: '', account: '', category: '', type: '', month: '', date_start: '', date_end: '' };
+                        window.location.href='{{ route('transactions.index') }}'">
                     <i class="bx bx-eraser"></i> Limpar
                 </x-button-outline>
             </div>
 
             <form action="{{ route('transactions.index') }}" method="GET">
-                <div class="grid grid-cols-12 gap-4 items-end">
+                <div class="grid grid-cols-12 gap-4 items-end mb-4">
                     <div class="col-span-2">
-                        <x-form.input name="search" label="Buscar transação" placeholder="Ex: Supermercado..." x-model="filters.search"/>
-                    </div>
-
-                    <div class="col-span-2">
-                        <x-form.select name="type" label="Tipo" x-model="filters.type">
-                            <option value="" class="text-slate-50">Todos os tipos</option>
-                            <x-form.select-option value="income">Entrada (+)</x-form.select-option>
-                            <x-form.select-option value="expense">Saída (-)</x-form.select-option>
-                        </x-form.select>
-                    </div>
-
-                    <div class="col-span-2">
-                        <x-form.select name="category_id" label="Categoria" x-model="filters.category">
-                            <option value="">Todas categorias</option>
-                             @foreach($categories as $cat)
-                                <x-form.select-option value="{{ $cat->id }}">{{ $cat->name }}</x-form.select-option>
+                        <x-form.select name="month" label="{{ 'Mês - ' . now()->translatedFormat('Y') }}" x-model="filters.month"
+                                       x-on:change="filters.date_start = ''; filters.date_end = ''">
+                            <option value="">Todos os meses</option>
+                            @foreach(collect(range(1, 12))->map(fn($m) => [
+                                'value' => now()->month($m)->format('Y-m'),
+                                'label' => now()->month($m)->translatedFormat('F'),
+                            ]) as $opt)
+                                <x-form.select-option value="{{ $opt['value'] }}">{{ $opt['label'] }}</x-form.select-option>
                             @endforeach
                         </x-form.select>
                     </div>
 
                     <div class="col-span-2">
-                        <x-form.input name="date_start" type="date" label="Data Início" x-model="filters.start_date"/>
+                        <x-form.select name="type" label="Tipo" x-model="filters.type">
+                            <option value="">Todos os tipos</option>
+                            <x-form.select-option value="income">Ganho (+)</x-form.select-option>
+                            <x-form.select-option value="expense">Gasto (-)</x-form.select-option>
+                        </x-form.select>
+                    </div>
+
+                    {{-- Conta --}}
+                    <div class="col-span-2">
+                        <x-form.select name="account_id" label="Conta" x-model="filters.account">
+                            <option value="">Todas as contas</option>
+                            @foreach($accounts as $account)
+                                <x-form.select-option value="{{ $account->id }}">{{ $account->name }}</x-form.select-option>
+                            @endforeach
+                        </x-form.select>
+                    </div>
+
+                    {{-- Categoria --}}
+                    <div class="col-span-2">
+                        <x-form.select name="category_id" label="Categoria" x-model="filters.category">
+                            <option value="">Todas categorias</option>
+                            @foreach($categories as $cat)
+                                <x-form.select-option value="{{ $cat->id }}">{{ $cat->name }}</x-form.select-option>
+                            @endforeach
+                        </x-form.select>
+                    </div>
+
+                    {{-- Busca --}}
+                    <div class="col-span-4">
+                        <x-form.input name="search" label="Buscar descrição" placeholder="Ex: Supermercado..." x-model="filters.search"/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-4 items-end">
+
+                    {{-- Período livre (desabilitado se mês selecionado) --}}
+                    <div class="col-span-2">
+                        <x-form.input name="date_start" type="date" label="Data início"
+                            x-model="filters.date_start" x-on:change="filters.month = ''"
+                            :disabled="request('month')" :class="request('month') ? 'opacity-40 cursor-not-allowed' : ''"
+                        />
                     </div>
 
                     <div class="col-span-2">
-                        <x-form.input name="date_end" type="date" label="Data Fim" x-model="filters.end_date" />
+                        <x-form.input name="date_end" type="date"
+                            label="Data fim" x-model="filters.date_end" x-on:change="filters.month = ''"
+                            :disabled="request('month')" :class="request('month') ? 'opacity-40 cursor-not-allowed' : ''"
+                        />
                     </div>
 
-                    <div class="flex items-center gap-2 col-span-2 justify-end">
-                        <x-button-primary type="submit" class="px-3 py-1 gap-2">
+                    {{-- Valor mínimo --}}
+                    <div class="col-span-2">
+                        <x-form.input name="amount_min" type="number" label="Valor mínimo"
+                            placeholder="0,00" step="0.01" min="0" x-model="filters.amount_min"
+                        />
+                    </div>
+
+                    {{-- Valor máximo --}}
+                    <div class="col-span-2">
+                        <x-form.input name="amount_max" type="number" label="Valor máximo"
+                            placeholder="0,00" step="0.01" min="0" x-model="filters.amount_max"
+                        />
+                    </div>
+
+                    <div class="col-span-4 flex justify-end">
+                        <x-button-primary type="submit" class="px-5 py-2 gap-2">
                             <i class="bx bx-filter text-lg"></i>
                             <span>Filtrar</span>
                         </x-button-primary>
@@ -251,7 +307,6 @@
                 </x-table>
             </x-table-scroll>
 
-            <!-- Paginação -->
             <div class="mt-4">
                 {{ $transactions->links() }}
             </div>
