@@ -120,7 +120,7 @@
                                 </x-table.row>
                                 @empty
                                     <x-table.row>
-                                        <x-table.col colspan="4" class="py-8 text-center text-sm text-gray-400">
+                                        <x-table.col colspan="5" class="py-8 text-center text-sm text-gray-400">
                                             Nenhuma transação encontrada.
                                         </x-table.col>
                                     </x-table.row>

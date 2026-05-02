@@ -23,6 +23,7 @@ class InstitutionSeeder extends Seeder
             ['name' => 'XP Investimentos', 'color' => '#000000', 'image' => 'banks-logos/xp-investimentos.svg'],
             ['name' => 'Banrisul', 'color' => '#005CA9', 'image' => 'banks-logos/banrisul-logo.svg'],
             ['name' => 'Pic Pay', 'color' => '#21C25E', 'image' => 'banks-logos/pic-pay.svg'],
+            ['name' => '', 'color' => '#3b82f6', 'image' => 'banks-logos/default-bank.svg'],
         ];
 
         foreach ($institutions as $institution) {

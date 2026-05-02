@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto" x-data='{
-        selectedInstitution: { id: null, name: "Selecione um banco", image: "/banks-logos/default-bank.png" },
+        selectedInstitution: { id: null, name: "Selecione um banco", image: "banks-logos/default-bank.svg" },
         accountName: "",
         formInitialBalance: "",
         isDefault: false,
@@ -11,7 +11,7 @@
         formAction: "{{ route('accounts.store') }}",
 
         resetForm() {
-            this.selectedInstitution = { id: null, name: "Selecione um banco", image: "/banks-logos/default-bank.png" };
+            this.selectedInstitution = { id: null, name: "Selecione um banco", image: "banks-logos/default-bank.svg" };
             this.accountName = "";
             this.formInitialBalance = "";
             this.accountType = "";
@@ -71,7 +71,7 @@
                             institution: {
                                 id: {{ $account->institution->id }},
                                 name: '{{ addslashes($account->institution->name) }}',
-                                image: '{{ $account->institution->image }}'
+                                image: '{{ $account->institution->image ?? 'banks-logos/default-bank.svg' }}'
                             }
                         })"
                     >

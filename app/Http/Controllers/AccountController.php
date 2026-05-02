@@ -15,7 +15,7 @@ class AccountController extends Controller
         private AccountService $accountService,
     ) {}
 
-    public function index() // View Exibir contas
+    public function index()
     {
         $this->authorize('viewAny', Account::class);
         $accounts = $this->accountService->getAccountsByUser(auth()->id());
@@ -44,19 +44,19 @@ class AccountController extends Controller
         }
     }
 
-    public function show(Account $account)
-    {
-        $this->authorize('view', $account);
-
-        return view('accounts.show', compact('account'));
-    }
-
-    public function edit(Account $account)
-    {
-        $this->authorize('update', $account);
-
-        return view('accounts.edit', compact('account'));
-    }
+//    public function show(Account $account)
+//    {
+//        $this->authorize('view', $account);
+//
+//        return view('accounts.show', compact('account'));
+//    }
+//
+//    public function edit(Account $account)
+//    {
+//        $this->authorize('update', $account);
+//
+//        return view('accounts.edit', compact('account'));
+//    }
 
     public function update(UpdateAccountRequest $request, Account $account)
     {
