@@ -75,21 +75,21 @@ class TransactionController extends Controller
         return to_route('transactions.index')->with('success', 'Transação criada com sucesso!');
     }
 
-//    public function show(Transaction $transaction)
-//    {
-//        $this->authorize('view', $transaction);
-//
-//        return view('transactions.show', compact('transaction'));
-//    }
-//
-//    public function edit(Transaction $transaction)
-//    {
-//        $this->authorize('update', $transaction);
-//        $accounts = $this->accountService->getAccountsByUser(auth()->id());
-//        $categories = $this->categoryService->getAllByUser(auth()->id());
-//
-//        return view('transactions.edit', compact('transaction', 'accounts', 'categories'));
-//    }
+    //    public function show(Transaction $transaction)
+    //    {
+    //        $this->authorize('view', $transaction);
+    //
+    //        return view('transactions.show', compact('transaction'));
+    //    }
+    //
+    //    public function edit(Transaction $transaction)
+    //    {
+    //        $this->authorize('update', $transaction);
+    //        $accounts = $this->accountService->getAccountsByUser(auth()->id());
+    //        $categories = $this->categoryService->getAllByUser(auth()->id());
+    //
+    //        return view('transactions.edit', compact('transaction', 'accounts', 'categories'));
+    //    }
 
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
     {

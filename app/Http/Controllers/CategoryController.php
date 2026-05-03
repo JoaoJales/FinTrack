@@ -35,12 +35,12 @@ class CategoryController extends Controller
         return to_route('categories.index')->with('success', 'Categoria criada com sucesso!.');
     }
 
-//    public function show(Category $category)
-//    {
-//        $this->authorize('view', $category);
-//
-//        return view('categories.show', compact('category'));
-//    }
+    //    public function show(Category $category)
+    //    {
+    //        $this->authorize('view', $category);
+    //
+    //        return view('categories.show', compact('category'));
+    //    }
 
     public function edit(Category $category)
     {

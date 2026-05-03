@@ -3,10 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+
 class DemoUserSeeder
 {
     const EMAIL = 'demo@fintrack.com';
-    const NAME  = 'Demo User';
+
+    const NAME = 'Demo User';
 
     public static function resolve(): User
     {

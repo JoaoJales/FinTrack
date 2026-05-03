@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class DemoCategorySeeder extends Seeder
 {
@@ -25,19 +25,19 @@ class DemoCategorySeeder extends Seeder
 
             // RECEITAS personalizadas
             ['name' => 'Freelance',         'type' => 'income',  'icon' => 'bx bx-laptop',       'color' => '#3498DB'],
-            ['name' => 'Aluguel recebido',  'type' => 'income',  'icon' => 'bx bx-building-house','color' => '#1ABC9C'],
+            ['name' => 'Aluguel recebido',  'type' => 'income',  'icon' => 'bx bx-building-house', 'color' => '#1ABC9C'],
         ];
 
         foreach ($categories as $category) {
             Category::firstOrCreate(
                 [
                     'user_id' => $user->id,
-                    'name'    => $category['name'],
-                    'type'    => $category['type'],
+                    'name' => $category['name'],
+                    'type' => $category['type'],
                 ],
                 [
-                    'icon'        => $category['icon'],
-                    'color'       => $category['color'],
+                    'icon' => $category['icon'],
+                    'color' => $category['color'],
                     'is_editable' => true,
                 ]
             );

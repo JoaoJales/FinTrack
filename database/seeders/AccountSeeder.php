@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use App\Models\Institution;
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
 {
@@ -27,30 +27,30 @@ class AccountSeeder extends Seeder
         Account::firstOrCreate(
             ['user_id' => $user->id, 'name' => 'Nubank Conta'],
             [
-                'institution_id'  => $nubank->id,
-                'account_type'    => 'checking',
+                'institution_id' => $nubank->id,
+                'account_type' => 'checking',
                 'initial_balance' => 0,
-                'is_default'      => true,
+                'is_default' => true,
             ]
         );
 
         Account::firstOrCreate(
             ['user_id' => $user->id, 'name' => 'Itaú Corrente'],
             [
-                'institution_id'  => $itau->id,
-                'account_type'    => 'checking',
+                'institution_id' => $itau->id,
+                'account_type' => 'checking',
                 'initial_balance' => 0,
-                'is_default'      => false,
+                'is_default' => false,
             ]
         );
 
         Account::firstOrCreate(
             ['user_id' => $user->id, 'name' => 'BB Poupança'],
             [
-                'institution_id'  => $bb->id,
-                'account_type'    => 'savings',
+                'institution_id' => $bb->id,
+                'account_type' => 'savings',
                 'initial_balance' => 0,
-                'is_default'      => false,
+                'is_default' => false,
             ]
         );
     }
