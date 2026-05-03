@@ -30,7 +30,7 @@ class UpdateAccountRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'account_type' => ['required', new Enum(AccountType::class)],
             'institution_id' => ['required', 'exists:institutions,id'],
-            'is_default' => ['nullable'],
+            'is_default' => ['sometimes', 'nullable'],
         ];
     }
 

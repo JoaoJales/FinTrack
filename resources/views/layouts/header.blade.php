@@ -24,14 +24,23 @@
                 </x-nav-link>
 
                 <x-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
-                    {{ ('Minhas Contas') }}
+                    {{ ('Contas') }}
+                </x-nav-link>
+
+                <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                    {{ ('Categorias') }}
                 </x-nav-link>
             </div>
 
             <!-- User Menu (desktop) -->
             <div class="flex items-center space-x-3 pl-4 border-l border-gray-200">
                 <div class="text-right hidden sm:block">
-                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-sm font-semibold text-gray-800 leading-tight">
+                        {{ Auth::user()->name }}
+                    </p>
+                    <p class="text-xs text-gray-500 leading-tight">
+                        {{ Auth::user()->email }}
+                    </p>
                 </div>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">

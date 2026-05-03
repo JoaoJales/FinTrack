@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\User;
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use Illuminate\Support\Collection;
 
 class AccountService
@@ -42,19 +42,24 @@ class AccountService
 
     public function update(Account $account, array $request): void
     {
-        $wantsDefault = ! empty($request['is_default']);
+        if (array_key_exists('is_default', $request)) {
+            $wantsDefault = (bool) $request['is_default'];
 
-        if (! $wantsDefault && $account->is_default) {
-            throw new InvalidArgumentException('Não é possível desmarcar sua conta principal diretamente. Defina outra conta como principal.');
+            if (! $wantsDefault && $account->is_default) {
+                throw new InvalidArgumentException(
+                    'Não é possível desmarcar sua conta principal diretamente. Defina outra conta como principal.'
+                );
+            }
+
+            if ($wantsDefault && ! $account->is_default) {
+                Account::default()
+                    ->where('user_id', $account->user_id)
+                    ->update(['is_default' => false]);
+            }
+
+            $request['is_default'] = $wantsDefault;
         }
-        if ($wantsDefault && ! $account->is_default) {
-            Account::default()->where('user_id', $account->user_id)->update(['is_default' => false]);
-        }
-        $request['is_default'] = $wantsDefault;
         $account->update($request);
-
-        // busca o $account atualizado do banco + carrega o relacionamento institution
-        //        return $account->fresh('institution');
     }
 
     public function destroy(Account $account): void

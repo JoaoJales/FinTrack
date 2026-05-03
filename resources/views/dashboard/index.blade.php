@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div>
-                        <x-link href="#">Ver detalhes</x-link>
+                        <x-link href="{{ route('balance.index') }}">Ver detalhes</x-link>
                     </div>
                 </x-card>
             </div>
@@ -44,7 +44,7 @@
             <x-card>
                 <div class="flex justify-between items-center mb-6">
                     <span class="text-lg font-bold text-gray-800">Últimas Transações</span>
-                    <x-link href="{{ route('transactions.index') }}">Ver todas →</x-link>
+                    <x-link href="{{ route('transactions.index') }}">Ver extrato</x-link>
                 </div>
 
                 <x-table-scroll>

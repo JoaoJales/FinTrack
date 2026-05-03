@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -20,6 +21,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('accounts', AccountController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('categories', CategoryController::class);
+    Route::get('/balance', [BalanceController::class, 'index'])
+        ->name('balance.index')
+        ->middleware('auth');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
