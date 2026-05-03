@@ -19,7 +19,6 @@
     <body class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 min-h-screen flex items-center justify-center font-sans antialiased">
         <div class="w-full md:w-2/6 px-4 mt-8">
 
-            <!-- Topo: Logo e Títulos Globais -->
             <div class="flex flex-col items-center justify-center text-center space-y-1">
                 <a href="/">
                     <div class="inline-flex items-center justify-center p-2 w-24 h-24 bg-white rounded-full mb-4 shadow-lg hover:scale-105 transition-transform duration-300">
@@ -30,7 +29,6 @@
                 <p class="text-blue-100 text-base font-medium">Gerencie suas finanças de forma simples</p>
             </div>
 
-            <!-- Aqui é onde o cartão de Login ou Registro será injetado -->
             <div class="mt-4">
                 {{ $slot }}
             </div>

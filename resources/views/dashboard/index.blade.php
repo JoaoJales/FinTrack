@@ -7,7 +7,7 @@
         </div>
         <a href="{{ route('transactions.index') }}">
             <x-button-primary class="py-2 px-5 gap-2">
-                <span class="text-base">Ver Transações</span>
+                <span class="text-base">Ver Extrato</span>
                 <i class="bx bxs-right-arrow-alt text-xl"></i>
             </x-button-primary>
         </a>
@@ -20,7 +20,6 @@
         <div class="lg:col-span-8 space-y-6">
             <!-- Cards de Resumo -->
             <div class="gap-4">
-                <!-- Saldo Total -->
                 <x-card class="overflow-hidden flex justify-between">
                     <div class="">
                         <p class="text-sm font-medium text-gray-500 mb-1">Saldo Total</p>
@@ -374,14 +373,11 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-lg mb-1">Insight do mês</h3>
-{{--                        <p class="text-sm leading-relaxed">--}}
-{{--                            Você gastou 15% menos com Alimentação comparado ao mês passado. Continue assim!--}}
-{{--                        </p>--}}
                         <p class="text-sm leading-relaxed">
                             @if($expenses_by_category->isNotEmpty())
                                 Sua maior despesa este mês foi com
                                 <strong>{{ $expenses_by_category->first()->name }}</strong>
-                                (R$ @moneyBr($expenses_by_category->first()->total) ).
+                                (R$ @moneyBr($expenses_by_category->first()->total))
                             @else
                                 Nenhuma despesa registrada este mês. Ótimo começo!
                             @endif

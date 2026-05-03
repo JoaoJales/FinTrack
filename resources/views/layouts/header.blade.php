@@ -20,7 +20,7 @@
                 </x-nav-link>
 
                 <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
-                    {{ ('Transações') }}
+                    {{ ('Extrato') }}
                 </x-nav-link>
 
                 <x-nav-link :href="route('accounts.index')" :active="request()->routeIs('accounts.*')">
