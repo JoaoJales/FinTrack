@@ -18,6 +18,7 @@
         </include>
     </source>
     <php>
+        <env name="APP_KEY" value="base64:RyAZcQPBDguF/sDlzA+6fhPn9v5zEbM3iZ/SVCTyc1g="/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
@@ -29,6 +30,7 @@
         <env name="DB_DATABASE" value="fintrack_testing"/>
         <env name="DB_USERNAME" value="fintrack"/>
         <env name="DB_PASSWORD" value="secret"/>
+        <env name="DB_SSLMODE" value="disable"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

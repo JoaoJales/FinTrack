@@ -31,11 +31,16 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, xml, ctype, json, pdo, pdo_pgsql
+          extensions: mbstring, xml, ctype, json, pdo, pdo_pgsql, openssl, fileinfo, tokenizer
           coverage: none
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force --ansi
 
       - name: Run migrations
         env:
@@ -46,6 +51,7 @@ jobs:
           DB_DATABASE: fintrack_testing
           DB_USERNAME: fintrack
           DB_PASSWORD: secret
+          DB_SSLMODE: disable
         run: php artisan migrate --force
 
       - name: Run tests
@@ -57,4 +63,8 @@ jobs:
           DB_DATABASE: fintrack_testing
           DB_USERNAME: fintrack
           DB_PASSWORD: secret
+          DB_SSLMODE: disable
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
         run: php artisan test
