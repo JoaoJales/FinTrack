@@ -10,7 +10,8 @@ bootstrap/cache/*
 .env
 .env.*
 !.env.example
-docker
+# Apenas o nginx do compose local; templates/scripts do deploy Railway precisam entrar na imagem.
+docker/nginx/default.conf
 *.md
 tests
 .phpunit.cache

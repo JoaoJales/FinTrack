@@ -1,0 +1,78 @@
+# Imagem para deploy no Railway: PHP-FPM + Nginx na mesma rede, escuta em $PORT.
+# No painel Railway: Root Directory = repo root, Dockerfile Path = Dockerfile.railway
+#
+# Release command sugerido: php artisan migrate --force
+
+FROM php:8.4-fpm-alpine
+
+RUN apk add --no-cache \
+    bash \
+    curl \
+    gettext \
+    nginx \
+    supervisor \
+    sqlite-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    libzip-dev \
+    oniguruma-dev \
+    postgresql-dev \
+    icu-dev \
+    autoconf \
+    g++ \
+    make \
+    zip \
+    unzip \
+    git \
+    nodejs \
+    npm
+
+RUN docker-php-ext-configure gd --with-jpeg --with-webp \
+    && docker-php-ext-install \
+        pdo \
+        pdo_sqlite \
+        pdo_pgsql \
+        pgsql \
+        mbstring \
+        zip \
+        bcmath \
+        gd \
+        opcache \
+        intl \
+        pcntl
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY docker/nginx/railway.conf.template /etc/nginx/templates/default.conf.template
+COPY docker/railway/supervisord.conf /etc/supervisord.conf
+COPY docker/railway/entrypoint.sh /usr/local/bin/railway-entrypoint.sh
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+RUN composer dump-autoload --optimize --no-dev \
+    && npm run build \
+    && rm -rf node_modules
+
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]
