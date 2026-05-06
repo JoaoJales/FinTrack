@@ -50,6 +50,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 COPY docker/nginx/railway.conf.template /etc/nginx/templates/default.conf.template
+COPY docker/railway/php-fpm-zz-railway.conf /usr/local/etc/php-fpm.d/zz-railway.conf
 COPY docker/railway/supervisord.conf /etc/supervisord.conf
 COPY docker/railway/entrypoint.sh /usr/local/bin/railway-entrypoint.sh
 RUN chmod +x /usr/local/bin/railway-entrypoint.sh

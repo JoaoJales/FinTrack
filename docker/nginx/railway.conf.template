@@ -4,6 +4,9 @@ server {
     root /var/www/html/public;
     index index.php index.html;
 
+    access_log /dev/stdout;
+    error_log /dev/stderr notice;
+
     charset utf-8;
 
     gzip on;
@@ -24,6 +27,9 @@ server {
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_read_timeout 300;
+        fastcgi_buffer_size 128k;
+        fastcgi_buffers 4 256k;
+        fastcgi_busy_buffers_size 256k;
     }
 
     location ~ /\.(?!well-known).* {
