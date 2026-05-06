@@ -4,6 +4,7 @@ FROM php:8.4-fpm-alpine
 RUN apk add --no-cache \
     bash \
     curl \
+    sqlite-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     libwebp-dev \
@@ -20,10 +21,11 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-# Extensões PHP para Laravel + PostgreSQL
+# Extensões PHP para Laravel + PostgreSQL + SQLite (testes PHPUnit)
 RUN docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install \
         pdo \
+        pdo_sqlite \
         pdo_pgsql \
         pgsql \
         mbstring \
