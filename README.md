@@ -159,8 +159,6 @@ Depois:
 php artisan test
 ```
 
-No repositório, o workflow [`.github/workflows/tests.yml`](.github/workflows/tests.yml) sobe um serviço PostgreSQL e executa `composer install`, migrações e `php artisan test` em cada push/PR.
-
 ---
 
 ## 🔧 Comandos Make (Docker)
