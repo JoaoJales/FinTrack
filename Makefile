@@ -26,12 +26,18 @@ ps:         ## Lista containers rodando
 ## ─── App ─────────────────────────────────────────────────────────────────────
 
 setup:      ## Primeira configuração após clonar o projeto
-	cp .env.docker.example .env.docker
+	@if [ ! -f .env.docker ]; then cp .env.docker.example .env.docker; fi
 	cp .env.docker .env
 	docker compose up -d --build
-	sleep 8
+	@echo "⏳ Aguardando PostgreSQL ficar pronto..."
+	@until docker exec fintrack_postgres pg_isready -U fintrack > /dev/null 2>&1; do sleep 1; done
+	@echo "✅ PostgreSQL pronto"
+	docker exec $(CONTAINER) composer install
+	docker exec $(CONTAINER) npm install
+	docker exec $(CONTAINER) npm run build
 	docker exec $(CONTAINER) php artisan key:generate
-	docker exec $(CONTAINER) php artisan migrate --seed
+	docker exec $(CONTAINER) php artisan config:clear
+	docker exec $(CONTAINER) php artisan migrate:fresh --seed
 	@echo ""
 	@echo "✅ FinTrack rodando em http://localhost:8080"
 

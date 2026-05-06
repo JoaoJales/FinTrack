@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Dependências do sistema
 RUN apk add --no-cache \
@@ -10,6 +10,10 @@ RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     postgresql-dev \
+    icu-dev \
+    autoconf \
+    g++ \
+    make \
     zip \
     unzip \
     git \
@@ -17,15 +21,22 @@ RUN apk add --no-cache \
     npm
 
 # Extensões PHP para Laravel + PostgreSQL
-RUN docker-php-ext-install \
-    pdo \
-    pdo_pgsql \
-    pgsql \
-    mbstring \
-    zip \
-    bcmath \
-    gd \
-    opcache
+RUN docker-php-ext-configure gd --with-jpeg --with-webp \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        pgsql \
+        mbstring \
+        zip \
+        bcmath \
+        gd \
+        opcache \
+        intl \
+        pcntl
+
+# Extensão phpredis via PECL
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -34,7 +45,10 @@ WORKDIR /var/www/html
 
 # Copia dependências primeiro (melhor cache de layers)
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader --prefer-dist
+RUN composer install \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist
 
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -47,8 +61,8 @@ RUN composer dump-autoload --optimize
 RUN npm run build
 
 # Permissões
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 9000
 
