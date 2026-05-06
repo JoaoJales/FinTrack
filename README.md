@@ -62,7 +62,7 @@ O **FinTrack** é uma aplicação de finanças pessoais que permite ao usuário:
 |---|---|
 | Backend | Laravel 11 |
 | Frontend | Blade + Alpine.js + Tailwind CSS |
-| Banco de dados | MySQL |
+| Banco de dados | PostgreSQL |
 | Gráficos | ApexCharts |
 | Ícones | Boxicons |
 | Formatação de código | Laravel Pint |
@@ -75,11 +75,27 @@ O **FinTrack** é uma aplicação de finanças pessoais que permite ao usuário:
 - PHP **^8.2**
 - Composer **^2.x**
 - Node.js **^20.x** + NPM
-- MySQL **^8.0**
+- PostgreSQL **^15**
+- Docker
 
 ---
 
 ## 🚀 Instalação
+
+### Com Docker (recomendado)
+
+O repositório inclui um `Makefile` com atalhos que sobem a stack e configuram a aplicação dentro dos containers.
+
+```bash
+git clone https://github.com/seu-usuario/fintrack.git
+cd fintrack
+
+make setup
+```
+
+Ao final, a aplicação fica em **http://localhost:8080**. Na primeira execução, o `setup` copia `.env.docker.example` para `.env.docker` (se ainda não existir), sincroniza com `.env`, sobe os serviços, instala dependências, gera a chave, roda `migrate:fresh --seed` e compila os assets.
+
+### Instalação local (sem Docker)
 
 ```bash
 # 1. Clonar o repositório
@@ -107,7 +123,59 @@ npm run dev
 
 ---
 
+## 🔧 Comandos Make (Docker)
+
+Todos os alvos abaixo assumem **Docker Compose** ativo; a app roda no container `fintrack_app`.
+
+### Ambiente
+
+| Comando | Descrição |
+|---|---|
+| `make up` | Sobe todos os containers em segundo plano |
+| `make down` | Para e remove os containers da stack |
+| `make build` | Reconstrói a imagem do serviço `app` |
+| `make restart` | Reinicia os containers |
+| `make logs` | Acompanha os logs (`docker compose logs -f`) |
+| `make ps` | Lista os containers em execução |
+
+### Aplicação
+
+| Comando | Descrição |
+|---|---|
+| `make setup` | Primeira configuração: `.env.docker`, sobe stack, `composer install`, `npm install`, `npm run build`, `key:generate`, `migrate:fresh --seed` |
+| `make bash` | Abre um shell interativo dentro do container da app |
+| `make artisan CMD="…"` | Executa `php artisan` no container. Ex.: `make artisan CMD="route:list"` |
+| `make migrate` | Roda `php artisan migrate` |
+| `make fresh` | `migrate:fresh --seed` |
+| `make seed` | `php artisan db:seed` |
+| `make test-data` | Roda o seeder `TestDataSeeder` |
+| `make tinker` | Abre o Tinker |
+
+### Assets
+
+| Comando | Descrição |
+|---|---|
+| `make npm-dev` | `npm run dev` (watch) dentro do container |
+| `make npm-build` | `npm run build` (produção) dentro do container |
+
+### Qualidade de código
+
+| Comando | Descrição |
+|---|---|
+| `make pint` | Formata com Laravel Pint |
+| `make pint-test` | Verifica formatação sem alterar arquivos |
+
+### Banco de dados
+
+| Comando | Descrição |
+|---|---|
+| `make psql` | Abre o cliente `psql` no container PostgreSQL |
+
+---
+
 ## 💻 Comandos Principais
+
+Comandos executados **na máquina host** (instalação local). Se você usa **Docker**, os equivalentes estão na seção [Comandos Make (Docker)](#comandos-make-docker).
 
 ### Desenvolvimento
 
