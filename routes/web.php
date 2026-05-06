@@ -8,22 +8,16 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//    return redirect('/dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard.index');
-Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.index');
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('accounts', AccountController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('categories', CategoryController::class);
+
     Route::get('/balance', [BalanceController::class, 'index'])
-        ->name('balance.index')
-        ->middleware('auth');
+        ->name('balance.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

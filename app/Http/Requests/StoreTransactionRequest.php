@@ -3,12 +3,15 @@
 namespace App\Http\Requests;
 
 use App\Helpers\FormatHelper;
+use App\Http\Requests\Concerns\ValidatesTransactionReferences;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTransactionRequest extends FormRequest
 {
+    use ValidatesTransactionReferences;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -40,8 +43,8 @@ class StoreTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_id' => ['required', 'exists:accounts,id'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'account_id' => $this->accountIdRules(),
+            'category_id' => $this->categoryIdRules(),
             'amount' => ['required', 'numeric', 'min:0.01'],
             'description' => ['nullable', 'string', 'max:255'],
             'date' => ['nullable', 'date'],

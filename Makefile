@@ -62,6 +62,20 @@ test-data:  ## Popula com dados de teste
 tinker:     ## Abre o Tinker
 	docker exec -it $(CONTAINER) php artisan tinker
 
+test:       ## Roda php artisan test (Postgres do compose: host postgres, DB fintrack_testing)
+	@docker inspect -f '{{.State.Running}}' fintrack_postgres 2>/dev/null | grep -q true || (echo "Erro: fintrack_postgres não está rodando. Execute: make up  ou  make setup" && exit 1)
+	@docker inspect -f '{{.State.Running}}' $(CONTAINER) 2>/dev/null | grep -q true || (echo "Erro: $(CONTAINER) não está rodando. Execute: make up  ou  make setup" && exit 1)
+	@echo "⏳ Aguardando PostgreSQL..."
+	@n=0; until docker exec fintrack_postgres pg_isready -U fintrack > /dev/null 2>&1; do \
+		n=$$((n+1)); if [ $$n -gt 60 ]; then echo "Timeout aguardando PostgreSQL."; exit 1; fi; \
+		sleep 1; \
+	done
+	@docker exec fintrack_postgres psql -U fintrack -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'fintrack_testing'" | grep -q 1 \
+		|| docker exec fintrack_postgres psql -U fintrack -d postgres -c "CREATE DATABASE fintrack_testing OWNER fintrack;"
+	docker exec -e DB_HOST=postgres -e DB_PORT=5432 $(CONTAINER) php artisan config:clear --ansi
+	docker exec -e DB_HOST=postgres -e DB_PORT=5432 $(CONTAINER) php artisan route:clear --ansi
+	docker exec -e DB_HOST=postgres -e DB_PORT=5432 $(CONTAINER) php artisan test
+
 ## ─── Assets ──────────────────────────────────────────────────────────────────
 
 npm-dev:    ## Compila assets em watch mode
@@ -83,4 +97,4 @@ pint-test:  ## Verifica formatação sem alterar
 psql:       ## Abre o CLI do PostgreSQL
 	docker exec -it fintrack_postgres psql -U fintrack -d fintrack
 
-.PHONY: up down build restart logs ps setup bash artisan migrate fresh seed test-data tinker npm-dev npm-build pint pint-test psql
+.PHONY: up down build restart logs ps setup bash artisan migrate fresh seed test-data tinker test npm-dev npm-build pint pint-test psql

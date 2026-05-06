@@ -68,6 +68,10 @@ O **FinTrack** é uma aplicação de finanças pessoais que permite ao usuário:
 | Formatação de código | Laravel Pint |
 | Datas | Carbon (locale pt_BR) |
 
+### Banco de dados (PostgreSQL obrigatório)
+
+O projeto assume **PostgreSQL** em todos os ambientes (app, Docker e testes). O dashboard e a página de saldos usam funções SQL específicas do PostgreSQL (por exemplo `TO_CHAR` e `EXTRACT`). **SQLite e MySQL não são suportados** para rodar a aplicação nem a suíte de testes automatizados.
+
 ---
 
 ## 📦 Requisitos
@@ -121,6 +125,42 @@ php artisan migrate --seed
 npm run dev
 ```
 
+Se o PostgreSQL do `docker compose` estiver publicado na porta **5433** no host (padrão deste repositório), ao rodar testes na máquina host defina `DB_PORT=5433` (variável de ambiente) ou ajuste o [`phpunit.xml`](phpunit.xml) temporariamente.
+
+---
+
+## Testes automatizados
+
+A suíte usa **PostgreSQL**, com credenciais e banco definidos no [`phpunit.xml`](phpunit.xml) (banco `fintrack_testing`, usuário `fintrack`, senha `secret`).
+
+### Com Docker (`make test`)
+
+Com a stack no ar (`make up` ou após `make setup`), na raiz do projeto:
+
+```bash
+make test
+```
+
+O alvo aguarda o Postgres ficar pronto, cria o banco `fintrack_testing` se ainda não existir e roda `php artisan test` **dentro** do container `fintrack_app`, com `DB_HOST=postgres` e `DB_PORT=5432` (rede do Compose), alinhado ao [`phpunit.xml`](phpunit.xml).
+
+### Sem Docker (PHP no host)
+
+É necessária a extensão **`pdo_pgsql`**. O [`phpunit.xml`](phpunit.xml) usa host `127.0.0.1` e porta `5432` (se o Postgres do Compose estiver só na **5433** no host, use `DB_PORT=5433 php artisan test`).
+
+Crie o banco de testes uma vez, se ainda não existir:
+
+```sql
+CREATE DATABASE fintrack_testing OWNER fintrack;
+```
+
+Depois:
+
+```bash
+php artisan test
+```
+
+No repositório, o workflow [`.github/workflows/tests.yml`](.github/workflows/tests.yml) sobe um serviço PostgreSQL e executa `composer install`, migrações e `php artisan test` em cada push/PR.
+
 ---
 
 ## 🔧 Comandos Make (Docker)
@@ -149,6 +189,7 @@ Todos os alvos abaixo assumem **Docker Compose** ativo; a app roda no container 
 | `make fresh` | `migrate:fresh --seed` |
 | `make seed` | `php artisan db:seed` |
 | `make test-data` | Roda o seeder `TestDataSeeder` |
+| `make test` | Roda `php artisan test` no container (Postgres do compose, banco `fintrack_testing`) |
 | `make tinker` | Abre o Tinker |
 
 ### Assets

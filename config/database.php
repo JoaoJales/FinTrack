@@ -17,7 +17,9 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    // FinTrack usa SQL específico do PostgreSQL em dashboard e saldos; o default
+    // evita cair em sqlite sem DB_CONNECTION explícito (ver README).
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------

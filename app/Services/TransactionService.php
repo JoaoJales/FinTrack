@@ -75,7 +75,34 @@ class TransactionService
         $request['user_id'] = $userId;
         $request['date'] = $request['date'] ?? now();
 
-        $accountBelongsToUser = Account::where('id', $request['account_id'])
+        $this->assertAccountAndCategoryAllowedForUser(
+            $userId,
+            (int) $request['account_id'],
+            (int) $request['category_id'],
+        );
+
+        return Transaction::create($request);
+    }
+
+    public function update(Transaction $transaction, array $request): void
+    {
+        $this->assertAccountAndCategoryAllowedForUser(
+            (int) $transaction->user_id,
+            (int) $request['account_id'],
+            (int) $request['category_id'],
+        );
+
+        $transaction->update($request);
+
+        //        return $transaction->fresh();
+    }
+
+    /**
+     * Account must belong to the user; category must be owned by the user or global (non-editable).
+     */
+    private function assertAccountAndCategoryAllowedForUser(int $userId, int $accountId, int $categoryId): void
+    {
+        $accountBelongsToUser = Account::where('id', $accountId)
             ->where('user_id', $userId)
             ->exists();
 
@@ -83,25 +110,16 @@ class TransactionService
             abort(403);
         }
 
-        $categoryBelongsToUser = Category::where('id', $request['category_id'])
+        $categoryAllowed = Category::where('id', $categoryId)
             ->where(function ($query) use ($userId) {
-                $query->where('user_id', $userId) // Categorias do user
-                    ->orWhere('is_editable', false); // Ou Globais
+                $query->where('user_id', $userId)
+                    ->orWhere('is_editable', false);
             })
             ->exists();
 
-        if (! $categoryBelongsToUser) {
+        if (! $categoryAllowed) {
             abort(403);
         }
-
-        return Transaction::create($request);
-    }
-
-    public function update(Transaction $transaction, array $request): void
-    {
-        $transaction->update($request);
-
-        //        return $transaction->fresh();
     }
 
     public function destroy(Transaction $transaction): void

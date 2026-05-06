@@ -49,7 +49,7 @@ class BalanceService
         ];
     }
 
-    // Resultado por mês (PostgreSQL)
+    // Agregação mensal do ano corrente (expressões compatíveis apenas com PostgreSQL)
     private function getMonthlyResults(int $userId): Collection
     {
 
