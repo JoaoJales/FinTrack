@@ -16,17 +16,17 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     </head>
-    <body class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 min-h-screen flex items-center justify-center font-sans antialiased">
-        <div class="w-full md:w-2/6 px-4 mt-8">
+    <body class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 min-h-screen flex items-start sm:items-center justify-center font-sans antialiased pb-[env(safe-area-inset-bottom)] pt-6 sm:pt-8">
+        <div class="w-full max-w-md px-4 sm:px-4 mx-auto">
 
             <div class="flex flex-col items-center justify-center text-center space-y-1">
                 <a href="/">
-                    <div class="inline-flex items-center justify-center p-2 w-24 h-24 bg-white rounded-full mb-4 shadow-lg hover:scale-105 transition-transform duration-300">
+                    <div class="inline-flex items-center justify-center p-2 w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full mb-4 shadow-lg hover:scale-105 transition-transform duration-300">
                         <img src="{{ asset('images/logo-fintrack.png') }}" alt="FinTrack Logo" class="w-full h-full object-contain drop-shadow-md">
                     </div>
                 </a>
-                <h1 class="text-5xl font-bold text-white tracking-tight">FinTrack</h1>
-                <p class="text-blue-100 text-base font-medium">Gerencie suas finanças de forma simples</p>
+                <h1 class="text-3xl sm:text-5xl font-bold text-white tracking-tight">FinTrack</h1>
+                <p class="text-blue-100 text-sm sm:text-base font-medium px-2">Gerencie suas finanças de forma simples</p>
             </div>
 
             <div class="mt-4">

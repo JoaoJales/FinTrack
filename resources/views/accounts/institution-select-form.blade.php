@@ -1,4 +1,4 @@
-<x-modal name="institution-select" title="Selecione o Banco" width="md:w-1/4">
+<x-modal name="institution-select" title="Selecione o Banco" width="max-w-sm sm:max-w-md md:max-w-lg">
     <div class="grid grid-cols-1 gap-3">
         @foreach($institutions as $institution)
             @continue(str_contains($institution->image, 'default-bank.svg') || empty($institution->image))

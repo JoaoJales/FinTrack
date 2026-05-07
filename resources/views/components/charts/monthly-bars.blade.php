@@ -13,10 +13,21 @@
             chart: {
                 type: 'bar',
                 height: 200,
+                width: '100%',
                 toolbar: { show: false },
                 animations: { enabled: true },
                 fontFamily: 'inherit',
             },
+            responsive: [{
+                breakpoint: 640,
+                options: {
+                    chart: { height: 240 },
+                    legend: {
+                        position: 'bottom',
+                        horizontalAlign: 'center',
+                    },
+                },
+            }],
             series: [
                 { name: 'Ganhos',  data: {{ json_encode($income) }} },
                 { name: 'Gastos',  data: {{ json_encode($expense) }} },
@@ -53,6 +64,7 @@
                 show: true,
                 position: 'top',
                 horizontalAlign: 'right',
+                offsetY: 0,
                 fontSize: '12px',
                 markers: { width: 8, height: 8, radius: 8 },
                 labels: { colors: '#6b7280' },

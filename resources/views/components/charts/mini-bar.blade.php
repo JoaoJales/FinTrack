@@ -4,7 +4,7 @@
     'saidas' => 0
 ])
 
-<div
+<div class="w-full max-w-[120px] sm:max-w-[150px] shrink-0 mx-auto sm:mx-0"
     x-data
     x-init="
         new ApexCharts($el.querySelector('[data-chart]'), {
@@ -14,10 +14,16 @@
             }],
             chart: {
                 type: 'bar',
-                height: 150,
-                width: 150,
+                height: 140,
+                width: '100%',
                 sparkline: { enabled: true }
             },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: { height: 120 },
+                },
+            }],
             colors: ['#10b981', '#f43f5e'],
             plotOptions: {
                 bar: {
@@ -36,5 +42,5 @@
         }).render()
     "
 >
-    <div data-chart class=""></div>
+    <div data-chart class="w-full min-h-[120px]"></div>
 </div>

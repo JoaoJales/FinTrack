@@ -1,4 +1,4 @@
-<x-modal name="category-select" title="Categorias" width="md:w-1/4">
+<x-modal name="category-select" title="Categorias" width="max-w-sm sm:max-w-md md:max-w-lg">
     {{-- Despesas --}}
     <div x-show="active === '{{ App\Enums\TransactionType::EXPENSE->value }}'">
         <p class="text-xs font-semibold text-gray-400 uppercase mb-3">Despesas</p>

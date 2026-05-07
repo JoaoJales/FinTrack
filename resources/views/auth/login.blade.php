@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="bg-white rounded-xl shadow-2xl p-8">
+    <div class="bg-white rounded-xl shadow-2xl p-5 sm:p-8">
 
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -31,7 +31,7 @@
                 autocomplete="current-password"
             />
 
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label for="remember_me" class="inline-flex items-center gap-2 cursor-pointer">
                     <input
                         id="remember_me"

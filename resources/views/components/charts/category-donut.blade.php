@@ -14,8 +14,16 @@
             chart: {
                 type: 'donut',
                 height: 200,
-                animations: { enabled: true }
+                width: '100%',
+                animations: { enabled: true },
+                toolbar: { show: false },
             },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: { height: 180 },
+                },
+            }],
             series: {{ json_encode($data) }},
             labels: {{ json_encode($labels) }},
             colors: {{ json_encode($colors) }},

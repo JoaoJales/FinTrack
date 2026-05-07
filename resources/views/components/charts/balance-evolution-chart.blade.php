@@ -32,10 +32,17 @@
             chart: {
                 type: 'line',
                 height: 280,
+                width: '100%',
                 toolbar: { show: false },
                 fontFamily: 'inherit',
                 animations: { enabled: true },
             },
+            responsive: [{
+                breakpoint: 640,
+                options: {
+                    chart: { height: 220 },
+                },
+            }],
             series: allSeries,
             xaxis: {
                 categories: {{ json_encode($labels) }},
@@ -80,13 +87,13 @@
     "
 >
     {{-- Header do Gráfico com Toggle --}}
-    <div class="flex items-center justify-between mb-6">
-        <div>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div class="min-w-0">
             <h2 class="text-lg font-semibold text-gray-800">Evolução mensal</h2>
             <p class="text-sm text-gray-400">Ganhos, gastos e resultado líquido</p>
         </div>
 
-        <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
+        <div class="flex bg-gray-100 rounded-lg p-1 gap-1 shrink-0 self-start sm:self-auto">
             <button
                 type="button"
                 class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"

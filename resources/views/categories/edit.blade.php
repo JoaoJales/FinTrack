@@ -1,4 +1,4 @@
-<x-modal name="editar-categoria-{{ $category->id }}" width="md:w-1/3">
+<x-modal name="editar-categoria-{{ $category->id }}" width="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
     <x-slot name="headerTitle">Editar Categoria</x-slot>
 
     <div x-data="{

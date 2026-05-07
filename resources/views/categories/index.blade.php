@@ -54,7 +54,7 @@
                         </div>
 
                         {{-- Actions --}}
-                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        <div class="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150 shrink-0">
                             <button
                                 class="p-1 rounded-lg hover:bg-blue-100 text-slate-500 hover:text-blue-500 transition-colors"
                                 x-on:click="$dispatch('open-modal', 'editar-categoria-{{ $category->id }}')"

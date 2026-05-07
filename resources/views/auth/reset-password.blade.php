@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="bg-white rounded-xl shadow-2xl p-8">
+    <div class="bg-white rounded-xl shadow-2xl p-5 sm:p-8">
 
         <div class="text-start mb-6">
             <h2 class="text-xl font-bold text-gray-800">Nova Senha</h2>

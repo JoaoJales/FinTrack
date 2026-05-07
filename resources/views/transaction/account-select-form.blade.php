@@ -1,4 +1,4 @@
-<x-modal name="account-select" title="Contas" width="md:w-1/4">
+<x-modal name="account-select" title="Contas" width="max-w-sm sm:max-w-md md:max-w-lg">
     <div class="grid grid-cols-1 gap-3">
         @foreach($accounts as $account)
             <button

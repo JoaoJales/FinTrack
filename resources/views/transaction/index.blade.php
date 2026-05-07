@@ -68,18 +68,18 @@
             </x-button-primary>
         </div>
 
-        <div class="p-5 rounded-2xl border border-gray-100 shadow-lg mb-6 bg-gray-100">
-            <div class="flex items-center justify-between mb-4">
+        <div class="p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-lg mb-6 bg-gray-100">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <h4 class="text-lg font-bold text-gray-800">Filtros</h4>
-                <x-button-outline @click="filters = { search: '', account: '', category: '', type: '', month: '', date_start: '', date_end: '' };
+                <x-button-outline class="w-full sm:w-auto justify-center shrink-0" @click="filters = { search: '', account: '', category: '', type: '', month: '', date_start: '', date_end: '' };
                         window.location.href='{{ route('transactions.index') }}'">
                     <i class="bx bx-eraser"></i> Limpar
                 </x-button-outline>
             </div>
 
             <form action="{{ route('transactions.index') }}" method="GET">
-                <div class="grid grid-cols-12 gap-4 items-end mb-4">
-                    <div class="col-span-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-end mb-4">
+                    <div class="min-w-0">
                         <x-form.select name="month" label="{{ 'Mês - ' . now()->translatedFormat('Y') }}" x-model="filters.month"
                                        x-on:change="filters.date_start = ''; filters.date_end = ''">
                             <option value="">Todos os meses</option>
@@ -92,7 +92,7 @@
                         </x-form.select>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.select name="type" label="Tipo" x-model="filters.type">
                             <option value="">Todos os tipos</option>
                             <x-form.select-option value="income">Ganho (+)</x-form.select-option>
@@ -101,7 +101,7 @@
                     </div>
 
                     {{-- Conta --}}
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.select name="account_id" label="Conta" x-model="filters.account">
                             <option value="">Todas as contas</option>
                             @foreach($accounts as $account)
@@ -111,7 +111,7 @@
                     </div>
 
                     {{-- Categoria --}}
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.select name="category_id" label="Categoria" x-model="filters.category">
                             <option value="">Todas categorias</option>
                             @foreach($categories as $cat)
@@ -121,22 +121,22 @@
                     </div>
 
                     {{-- Busca --}}
-                    <div class="col-span-4">
+                    <div class="min-w-0">
                         <x-form.input name="search" label="Buscar descrição" placeholder="Ex: Supermercado..." x-model="filters.search"/>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 items-end">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-end">
 
                     {{-- Período livre (desabilitado se mês selecionado) --}}
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.input name="date_start" type="date" label="Data início"
                             x-model="filters.date_start" x-on:change="filters.month = ''"
                             :disabled="request('month')" :class="request('month') ? 'opacity-40 cursor-not-allowed' : ''"
                         />
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.input name="date_end" type="date"
                             label="Data fim" x-model="filters.date_end" x-on:change="filters.month = ''"
                             :disabled="request('month')" :class="request('month') ? 'opacity-40 cursor-not-allowed' : ''"
@@ -144,21 +144,21 @@
                     </div>
 
                     {{-- Valor mínimo --}}
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.input name="amount_min" type="number" label="Valor mínimo"
                             placeholder="0,00" step="0.01" min="0" x-model="filters.amount_min"
                         />
                     </div>
 
                     {{-- Valor máximo --}}
-                    <div class="col-span-2">
+                    <div class="min-w-0">
                         <x-form.input name="amount_max" type="number" label="Valor máximo"
                             placeholder="0,00" step="0.01" min="0" x-model="filters.amount_max"
                         />
                     </div>
 
-                    <div class="col-span-4 flex justify-end">
-                        <x-button-primary type="submit" class="px-5 py-2 gap-2">
+                    <div class="min-w-0 flex sm:col-span-2 lg:col-span-1 xl:col-span-1 pt-1 sm:pt-0">
+                        <x-button-primary type="submit" class="w-full sm:w-auto sm:ml-auto px-5 py-2 gap-2 justify-center">
                             <i class="bx bx-filter text-lg"></i>
                             <span>Filtrar</span>
                         </x-button-primary>

@@ -1,4 +1,4 @@
-<x-modal name="nova-conta" width="md:w-1/3">
+<x-modal name="nova-conta" width="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
     <x-slot name="headerTitle">
         <span x-text="formMethod === 'PUT' ? 'Editar Conta' : 'Nova Conta'"></span>
     </x-slot>

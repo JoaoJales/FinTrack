@@ -1,4 +1,7 @@
 <x-app-layout>
+    {{-- Largura extra só no Dashboard: estoura o max-w-7xl do layout --}}
+    <div class="relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] w-screen">
+        <div class="mx-auto w-full max-w-[100rem] px-3 sm:px-4 lg:px-8">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
@@ -20,10 +23,10 @@
         <div class="lg:col-span-8 space-y-6">
             <!-- Cards de Resumo -->
             <div class="gap-4">
-                <x-card class="overflow-hidden flex justify-between">
-                    <div class="">
+                <x-card class="overflow-hidden flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
+                    <div class="min-w-0">
                         <p class="text-sm font-medium text-gray-500 mb-1">Saldo Total</p>
-                        <h3 class="text-3xl font-bold text-gray-900">R$ @moneyBr($total_balance)</h3>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-gray-900">R$ @moneyBr($total_balance)</h3>
                         <div class="flex items-center mt-2 font-medium
                             {{ $balance_variation['positive'] ? 'text-emerald-600' : 'text-rose-600' }}">
 
@@ -33,7 +36,7 @@
                             @endif
                         </div>
                     </div>
-                    <div>
+                    <div class="shrink-0">
                         <x-link href="{{ route('balance.index') }}">Ver detalhes</x-link>
                     </div>
                 </x-card>
@@ -161,12 +164,12 @@
                         }
                     @endphp
 
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+                        <div class="min-w-0">
                             <h2 class="text-lg font-bold text-gray-800" x-text="tab === 'expense' ? 'Gastos por categoria' : 'Ganhos por categoria'"></h2>
                             <x-link href="{{ route('categories.index') }}">Ver minhas categorias</x-link>
                         </div>
-                        <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
+                        <div class="flex bg-gray-100 rounded-lg p-1 gap-1 shrink-0 self-start sm:self-auto">
                             <button
                                 class="p-1.5 rounded-md transition-colors"
                                 :class="tab === 'expense' ? 'bg-white shadow-sm text-rose-500' : 'text-gray-400 hover:text-gray-600'"
@@ -186,8 +189,8 @@
                         </div>
                     </div>
 
-                    <div class="flex">
-                        <div class="flex-1 flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row gap-6 sm:gap-4 items-stretch">
+                        <div class="flex-1 flex flex-col justify-between min-w-0">
                             <div class="mb-4">
                                 <p class="text-sm text-gray-500">
                                     <span x-show="tab === 'expense'">Total de gastos</span>
@@ -235,7 +238,7 @@
                         </div>
 
                         {{-- Charts --}}
-                        <div class="w-40 flex items-center justify-center">
+                        <div class="w-full max-w-[200px] mx-auto sm:mx-0 sm:w-40 shrink-0 flex items-center justify-center">
                             <div x-show="tab === 'expense'">
                                 <x-charts.category-donut
                                     id="chartGastos"
@@ -304,9 +307,9 @@
                     $isPositive   = $resultado >= 0;
                 @endphp
 
-                <div class="flex h-full">
+                <div class="flex flex-col gap-4 sm:flex-row sm:h-full sm:gap-2">
                     <!-- Lado esquerdo: textos e legendas -->
-                    <div class="flex-1 flex flex-col justify-between">
+                    <div class="flex-1 flex flex-col justify-between min-w-0">
                         <div>
                             <p class="text-sm font-medium text-gray-500 mb-1">
                                 Resultado ({{ now()->translatedFormat('M/y') }})
@@ -332,7 +335,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-end">
+                    <div class="flex items-end justify-center sm:justify-end shrink-0">
                         <x-charts.mini-bar :entradas="$totalIncome" :saidas="$totalExpense" />
                     </div>
                 </div>
@@ -340,14 +343,14 @@
 
             <!-- Contas Bancárias (Baseado na Image 1) -->
             <x-card>
-                <div class="flex justify-between items-center mb-6">
-                    <div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start mb-6">
+                    <div class="min-w-0">
                         <h2 class="text-lg font-bold text-gray-800">Contas Bancárias</h2>
-                        <p class="text-base font-medium text-gray-500 mt-1">
+                        <p class="text-base font-medium text-gray-500 mt-1 truncate">
                             R$ @moneyBr($total_balance)
                         </p>
                     </div>
-                    <x-link href="{{ route('accounts.index') }}">
+                    <x-link href="{{ route('accounts.index') }}" class="shrink-0">
                         Ver mais
                     </x-link>
                 </div>
@@ -385,6 +388,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </x-app-layout>

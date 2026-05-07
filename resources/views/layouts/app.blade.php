@@ -21,7 +21,7 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.header')
 
-            <main class="mx-8 px-4 sm:px-6 lg:px-8 py-8">
+            <main class="mx-auto max-w-7xl w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-8 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 {{ $slot }}
             </main>
         </div>
