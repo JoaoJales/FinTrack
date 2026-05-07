@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Enums\AccountType;
-use App\Enums\TransactionType;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -30,32 +29,21 @@ class TransactionUpdateIdorTest extends TestCase
         $userA = User::factory()->create();
         $userB = User::factory()->create();
 
-        $accountA = Account::query()->create([
-            'user_id' => $userA->id,
+        $accountA = Account::factory()->for($userA)->default()->create([
             'name' => 'Conta A',
             'institution_id' => null,
-            'account_type' => AccountType::CHECKING->value,
             'initial_balance' => 0,
-            'is_default' => true,
         ]);
 
-        $accountB = Account::query()->create([
-            'user_id' => $userB->id,
+        $accountB = Account::factory()->for($userB)->default()->create([
             'name' => 'Conta B',
             'institution_id' => null,
-            'account_type' => AccountType::CHECKING->value,
             'initial_balance' => 0,
-            'is_default' => true,
         ]);
 
-        $categoryA = Category::query()->create([
-            'name' => 'Cat A',
-            'type' => TransactionType::EXPENSE->value,
-            'is_editable' => true,
-            'user_id' => $userA->id,
-        ]);
+        $categoryA = Category::factory()->for($userA)->create(['name' => 'Cat A']);
 
-        $transaction = Transaction::query()->create([
+        $transaction = Transaction::factory()->create([
             'user_id' => $userA->id,
             'account_id' => $accountA->id,
             'category_id' => $categoryA->id,
@@ -82,30 +70,16 @@ class TransactionUpdateIdorTest extends TestCase
         $userA = User::factory()->create();
         $userB = User::factory()->create();
 
-        $accountA = Account::query()->create([
-            'user_id' => $userA->id,
+        $accountA = Account::factory()->for($userA)->default()->create([
             'name' => 'Conta A',
             'institution_id' => null,
-            'account_type' => AccountType::CHECKING->value,
             'initial_balance' => 0,
-            'is_default' => true,
         ]);
 
-        $categoryA = Category::query()->create([
-            'name' => 'Cat A',
-            'type' => TransactionType::EXPENSE->value,
-            'is_editable' => true,
-            'user_id' => $userA->id,
-        ]);
+        $categoryA = Category::factory()->for($userA)->create(['name' => 'Cat A']);
+        $categoryB = Category::factory()->for($userB)->create(['name' => 'Cat B']);
 
-        $categoryB = Category::query()->create([
-            'name' => 'Cat B',
-            'type' => TransactionType::EXPENSE->value,
-            'is_editable' => true,
-            'user_id' => $userB->id,
-        ]);
-
-        $transaction = Transaction::query()->create([
+        $transaction = Transaction::factory()->create([
             'user_id' => $userA->id,
             'account_id' => $accountA->id,
             'category_id' => $categoryA->id,
@@ -131,39 +105,24 @@ class TransactionUpdateIdorTest extends TestCase
     {
         $userA = User::factory()->create();
 
-        $accountA = Account::query()->create([
-            'user_id' => $userA->id,
+        $accountA = Account::factory()->for($userA)->default()->create([
             'name' => 'Conta A',
             'institution_id' => null,
-            'account_type' => AccountType::CHECKING->value,
             'initial_balance' => 0,
-            'is_default' => true,
         ]);
 
-        $accountA2 = Account::query()->create([
-            'user_id' => $userA->id,
+        $accountA2 = Account::factory()->for($userA)->create([
             'name' => 'Conta A2',
             'institution_id' => null,
-            'account_type' => AccountType::SAVINGS->value,
+            'account_type' => AccountType::SAVINGS,
             'initial_balance' => 0,
             'is_default' => false,
         ]);
 
-        $categoryA = Category::query()->create([
-            'name' => 'Cat A',
-            'type' => TransactionType::EXPENSE->value,
-            'is_editable' => true,
-            'user_id' => $userA->id,
-        ]);
+        $categoryA = Category::factory()->for($userA)->create(['name' => 'Cat A']);
+        $categoryA2 = Category::factory()->for($userA)->create(['name' => 'Cat A2']);
 
-        $categoryA2 = Category::query()->create([
-            'name' => 'Cat A2',
-            'type' => TransactionType::EXPENSE->value,
-            'is_editable' => true,
-            'user_id' => $userA->id,
-        ]);
-
-        $transaction = Transaction::query()->create([
+        $transaction = Transaction::factory()->create([
             'user_id' => $userA->id,
             'account_id' => $accountA->id,
             'category_id' => $categoryA->id,
