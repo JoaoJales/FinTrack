@@ -78,7 +78,7 @@ A **suíte de testes automatizados** usa **SQLite em memória** via [`phpunit.xm
 
 ## 📦 Requisitos
 
-- PHP **^8.2**
+- PHP **^8.4**
 - Composer **^2.x**
 - Node.js **^20.x** + NPM
 - PostgreSQL **^15** (aplicação)
