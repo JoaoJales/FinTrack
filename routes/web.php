@@ -8,7 +8,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+// TODO: reativar 'verified' quando o envio de e-mail estiver OK em produção
+Route::middleware([
+    'auth',
+    // 'verified',
+])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

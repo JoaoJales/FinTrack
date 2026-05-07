@@ -30,14 +30,15 @@ class WebMiddlewareAndProfileTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    public function test_unverified_user_cannot_access_verified_routes(): void
-    {
-        $user = User::factory()->unverified()->create();
-
-        $response = $this->actingAs($user)->get(route('dashboard'));
-
-        $response->assertRedirect(route('verification.notice'));
-    }
+    // Desativado enquanto o middleware `verified` está comentado em routes/web.php
+    // public function test_unverified_user_cannot_access_verified_routes(): void
+    // {
+    //     $user = User::factory()->unverified()->create();
+    //
+    //     $response = $this->actingAs($user)->get(route('dashboard'));
+    //
+    //     $response->assertRedirect(route('verification.notice'));
+    // }
 
     public function test_profile_update_rejects_duplicate_email(): void
     {
