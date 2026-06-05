@@ -37,4 +37,19 @@ class Institution extends Model
     {
         return $this->hasMany(Account::class);
     }
+
+    /**
+     * Logos multicoloridas (com branco ou várias cores) não devem usar brightness-0 invert.
+     *
+     * @var list<string>
+     */
+    private const MULTICOLOR_LOGOS = [
+        'banks-logos/mercado-pago.svg',
+        'banks-logos/banrisul-logo.svg',
+    ];
+
+    public function logoUsesWhiteFilter(): bool
+    {
+        return ! in_array($this->image, self::MULTICOLOR_LOGOS, true);
+    }
 }

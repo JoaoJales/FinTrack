@@ -4,10 +4,18 @@
 
 <div class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer border border-gray-100 shadow-sm hover:border-gray-200">
     <div class="flex items-center gap-3">
-        <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm"
-             style="background-color: {{ $account->institution->color ?? '#6B7280' }}">
+        @php($useWhiteLogo = $account->institution?->image ? $account->institution->logoUsesWhiteFilter() : true)
+        <div @class([
+                'w-14 h-14 rounded-xl flex items-center justify-center shadow-sm',
+                'p-2 bg-white' => ! $useWhiteLogo,
+            ])
+             @if($useWhiteLogo) style="background-color: {{ $account->institution->color ?? '#6B7280' }}" @endif>
             @if($account->institution?->image)
-                <x-institution-logo :image="$account->institution->image" :alt="$account->institution->name" white/>
+                <x-institution-logo
+                    :image="$account->institution->image"
+                    :alt="$account->institution->name"
+                    :white="$useWhiteLogo"
+                />
             @else
                 <span class="font-bold text-white text-lg">{{ strtoupper(substr($account->name, 0, 1)) }}</span>
             @endif
