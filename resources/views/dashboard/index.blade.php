@@ -71,7 +71,14 @@
 
                                     <x-table.col class="text-center align-middle">
                                         <div class="flex justify-center">
-                                            @if($transaction->category)
+                                            @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                                <div class="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full w-fit bg-blue-50">
+                                                    <div class="w-6 h-6 rounded-full flex items-center justify-center bg-blue-500">
+                                                        <i class="bx bx-transfer text-white text-sm"></i>
+                                                    </div>
+                                                    <span class="text-xs font-medium text-gray-700">Transferência</span>
+                                                </div>
+                                            @elseif($transaction->category)
                                                 <div class="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full w-fit"
                                                      style="background-color: {{ $transaction->category->color }}20">
                                                     <!-- Ícone -->
@@ -93,17 +100,26 @@
 
                                     <x-table.col class="text-center align-middle">
                                         <div class="flex justify-center">
+                                            @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                                <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full bg-gray-100 w-fit">
+                                                    <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
+                                                        <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
+                                                    </div>
+                                                    <span class="text-xs font-medium text-gray-500">→</span>
+                                                    <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
+                                                        <x-institution-logo :image="$transaction->destinationAccount->institution->image" :name="$transaction->destinationAccount->institution->name" size="w-4 h-4"/>
+                                                    </div>
+                                                </div>
+                                            @else
                                             <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full w-fit">
-                                                <!-- Logo do banco -->
                                                 <div class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-50 shadow-md">
                                                     <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
                                                 </div>
-
-                                                <!-- Nome da conta -->
                                                 <span class="text-xs font-medium text-gray-700">
                                                 {{ $transaction->account->name }}
                                             </span>
                                             </div>
+                                            @endif
                                         </div>
                                     </x-table.col>
 
@@ -113,10 +129,14 @@
                                         </span>
                                     </x-table.col>
 
-                                    <x-table.col class="text-right whitespace-nowrap font-bold {{ $transaction->category?->type?->color() }}">
+                                    <x-table.col class="text-right whitespace-nowrap font-bold {{ $transaction->type->color() }}">
                                         <span class="text-sm font-semibold tabular-nums">
-                                            {{ $transaction->category->type === \App\Enums\TransactionType::INCOME ? '+' : '-' }}
-                                            R$ @moneyBr($transaction->amount)
+                                            @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                                ↔ R$ @moneyBr($transaction->amount)
+                                            @else
+                                                {{ $transaction->type === \App\Enums\TransactionType::INCOME ? '+' : '-' }}
+                                                R$ @moneyBr($transaction->amount)
+                                            @endif
                                         </span>
                                     </x-table.col>
                                 </x-table.row>

@@ -5,12 +5,17 @@
                 type="button"
                 class="w-full p-3 bg-gray-50 hover:bg-blue-50 border-2 border-gray-100 hover:border-blue-400 flex items-center gap-3 rounded-xl transition cursor-pointer"
                 x-on:click="
-                    selectedAccount = {
+                    const data = {
                         id: '{{ $account->id }}',
-                        name: '{{ $account->name }}',
+                        name: '{{ addslashes($account->name) }}',
                         image: '{{ $account->institution->image }}',
-                        institutionName: '{{ $account->institution->name }}'
+                        institutionName: '{{ addslashes($account->institution->name) }}'
                     };
+                    if (accountPickerTarget === 'destination') {
+                        selectedDestinationAccount = data;
+                    } else {
+                        selectedAccount = data;
+                    }
                     $dispatch('close-modal', 'account-select')
                 "
             >

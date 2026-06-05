@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Policies\TransactionPolicy;

@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use App\Support\TransactionAggregates;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BalanceService
 {
@@ -28,12 +30,9 @@ class BalanceService
     private function getYearSummary(int $userId): array
     {
         $result = Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->whereYear('transactions.date', now()->year)
-            ->selectRaw("
-                SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-            ")
+            ->selectRaw(TransactionAggregates::incomeExpenseSelectSql())
             ->first();
 
         $income = (float) ($result->total_income ?? 0);
@@ -52,17 +51,17 @@ class BalanceService
     // Agregação mensal do ano corrente (expressões compatíveis apenas com PostgreSQL)
     private function getMonthlyResults(int $userId): Collection
     {
+        $monthNumber = $this->monthNumberSql();
 
         return Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->whereYear('transactions.date', now()->year)
             ->selectRaw("
-                EXTRACT(MONTH FROM transactions.date) as month_number,
-                SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-            ")
-            ->groupByRaw('EXTRACT(MONTH FROM transactions.date)')
-            ->orderByRaw('EXTRACT(MONTH FROM transactions.date)')
+                {$monthNumber} as month_number,
+                ".TransactionAggregates::incomeExpenseSelectSql().'
+            ')
+            ->groupByRaw($monthNumber)
+            ->orderByRaw($monthNumber)
             ->get()
             ->map(function ($row) {
                 $month = (int) $row->month_number;
@@ -84,16 +83,17 @@ class BalanceService
     // Dados para gráfico
     private function getLineChartData(int $userId): array
     {
+        $monthNumber = $this->monthNumberSql();
+
         $rows = Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->whereYear('transactions.date', now()->year)
             ->selectRaw("
-                EXTRACT(MONTH FROM transactions.date) as month_number,
-                SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-            ")
-            ->groupByRaw('EXTRACT(MONTH FROM transactions.date)')
-            ->orderByRaw('EXTRACT(MONTH FROM transactions.date)')
+                {$monthNumber} as month_number,
+                ".TransactionAggregates::incomeExpenseSelectSql().'
+            ')
+            ->groupByRaw($monthNumber)
+            ->orderByRaw($monthNumber)
             ->get()
             ->keyBy(function ($row) {
                 return (int) $row->month_number;
@@ -118,5 +118,14 @@ class BalanceService
         }
 
         return compact('labels', 'income', 'expense', 'net');
+    }
+
+    private function monthNumberSql(): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'pgsql' => 'EXTRACT(MONTH FROM transactions.date)',
+            'sqlite' => "CAST(strftime('%m', transactions.date) AS INTEGER)",
+            default => 'MONTH(transactions.date)',
+        };
     }
 }

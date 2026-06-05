@@ -40,6 +40,17 @@ class TransactionController extends Controller
             'color' => $defaultAccount?->institution?->color ?? '#6B7280',
         ];
 
+        $secondAccount = $accounts->count() >= 2 ? $accounts->where('id', '!=', $defaultAccount?->id)->first() : null;
+
+        $defaultDestinationAccountData = [
+            'id' => $secondAccount?->id,
+            'name' => $secondAccount?->name,
+            'image' => $secondAccount?->institution?->image,
+            'color' => $secondAccount?->institution?->color ?? '#6B7280',
+        ];
+
+        $canTransfer = $accounts->count() >= 2;
+
         $defaultExpenseCategoryData = [
             'id' => $defaultExpenseCategory?->id,
             'name' => $defaultExpenseCategory?->name,
@@ -57,6 +68,8 @@ class TransactionController extends Controller
             'defaultIncomeCategory',
             'defaultAccountData',
             'defaultExpenseCategoryData',
+            'defaultDestinationAccountData',
+            'canTransfer',
         )
         );
     }

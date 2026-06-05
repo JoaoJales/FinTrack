@@ -85,6 +85,7 @@ class TransactionSeeder extends Seeder
                 'date' => $date->format('Y-m-d'),
             ],
             [
+                'type' => $category->type,
                 'amount' => $amountInCents / 100,
             ]
         );

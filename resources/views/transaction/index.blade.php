@@ -12,6 +12,9 @@
             amount_max: "{{ request('amount_max') }}",
         },
         selectedAccount: @json($defaultAccountData),
+        selectedDestinationAccount: @json($defaultDestinationAccountData),
+        accountPickerTarget: "origin",
+        canTransfer: @json($canTransfer),
         selectedCategory: @json($defaultExpenseCategoryData),
         defaultExpenseCategory: @json($defaultExpenseCategory),
         defaultIncomeCategory: @json($defaultIncomeCategory),
@@ -29,6 +32,8 @@
 
             this.active = "{{ App\Enums\TransactionType::EXPENSE->value }}";
             this.selectedAccount = @json($defaultAccountData);
+            this.selectedDestinationAccount = @json($defaultDestinationAccountData);
+            this.accountPickerTarget = "origin";
             this.selectedCategory = @json($defaultExpenseCategoryData);
             this.formMethod = "POST";
             this.formAction = "{{ route('transactions.store') }}";
@@ -48,7 +53,8 @@
             this.formDescription = transaction.description;
             this.transactionDate = transaction.date;
             this.selectedAccount = transaction.account;
-            this.selectedCategory = transaction.category;
+            this.selectedCategory = transaction.category ?? { id: null, name: "", icon: "bx bx-transfer", color: "#3b82f6" };
+            this.selectedDestinationAccount = transaction.destinationAccount ?? @json($defaultDestinationAccountData);
 
             this.$dispatch("open-modal", "nova-transacao");
         }
@@ -60,7 +66,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Extrato</h1>
-                <p class="text-gray-500 mt-1">Gerencie suas receitas e despesas</p>
+                <p class="text-gray-500 mt-1">Gerencie suas receitas, despesas e transferências</p>
             </div>
             <x-button-primary class="py-2 px-5 gap-2" x-on:click="resetForm(); $dispatch('open-modal', 'nova-transacao')">
                 <i class="bx bx-plus text-xl"></i>
@@ -97,6 +103,7 @@
                             <option value="">Todos os tipos</option>
                             <x-form.select-option value="income">Ganho (+)</x-form.select-option>
                             <x-form.select-option value="expense">Gasto (-)</x-form.select-option>
+                            <x-form.select-option value="transfer">Transferência</x-form.select-option>
                         </x-form.select>
                     </div>
 
@@ -193,16 +200,27 @@
                                     {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}
                                 </x-table.col>
 
-                                <x-table.col class="text-right whitespace-nowrap font-bold {{ $transaction->category?->type?->color() }}">
+                                <x-table.col class="text-right whitespace-nowrap font-bold {{ $transaction->type->color() }}">
                                     <span class="text-sm font-semibold tabular-nums">
-                                        {{ $transaction->category->type === \App\Enums\TransactionType::INCOME ? '+' : '-' }}
-                                        R$ @moneyBr($transaction->amount)
+                                        @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                            ↔ R$ @moneyBr($transaction->amount)
+                                        @else
+                                            {{ $transaction->type === \App\Enums\TransactionType::INCOME ? '+' : '-' }}
+                                            R$ @moneyBr($transaction->amount)
+                                        @endif
                                     </span>
                                 </x-table.col>
 
                                 <x-table.col class="text-center align-middle">
                                     <div class="flex justify-center">
-                                        @if($transaction->category)
+                                        @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                            <div class="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full w-fit bg-blue-50">
+                                                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-blue-500">
+                                                    <i class="bx bx-transfer text-white text-sm"></i>
+                                                </div>
+                                                <span class="text-xs font-medium text-gray-700">Transferência</span>
+                                            </div>
+                                        @elseif($transaction->category)
                                             <div class="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full w-fit"
                                                  style="background-color: {{ $transaction->category->color }}20">
                                                 <!-- Ícone -->
@@ -224,17 +242,29 @@
 
                                 <x-table.col class="text-center align-middle">
                                     <div class="flex justify-center">
-                                        <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full bg-gray-100 w-fit">
-                                            <!-- Logo do banco -->
-                                            <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
-                                                <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
+                                        @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                            <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full bg-gray-100 w-fit">
+                                                <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
+                                                    <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
+                                                </div>
+                                                <span class="text-xs font-medium text-gray-500">→</span>
+                                                <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
+                                                    <x-institution-logo :image="$transaction->destinationAccount->institution->image" :name="$transaction->destinationAccount->institution->name" size="w-4 h-4"/>
+                                                </div>
                                             </div>
+                                        @else
+                                            <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full bg-gray-100 w-fit">
+                                                <!-- Logo do banco -->
+                                                <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
+                                                    <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
+                                                </div>
 
-                                            <!-- Nome da conta -->
-                                            <span class="text-xs font-medium text-gray-700">
-                                                {{ $transaction->account->name }}
-                                            </span>
-                                        </div>
+                                                <!-- Nome da conta -->
+                                                <span class="text-xs font-medium text-gray-700">
+                                                    {{ $transaction->account->name }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </x-table.col>
 
@@ -252,21 +282,30 @@
                                             class="text-slate-500 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition"
                                             x-on:click="openEditModal({
                                                 id: {{ $transaction->id }},
-                                                type: '{{ $transaction->category->type->value }}',
+                                                type: '{{ $transaction->type->value }}',
                                                 amount: '{{ number_format($transaction->amount, 2, ',', '.') }}',
-                                                description: '{{ addslashes($transaction->description) }}',
+                                                description: '{{ addslashes($transaction->description ?? '') }}',
                                                 date: '{{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}',
                                                 account: {
                                                     id: {{ $transaction->account->id }},
                                                     name: '{{ addslashes($transaction->account->name) }}',
                                                     image: '{{ $transaction->account->institution->image }}'
                                                 },
+                                                @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
+                                                destinationAccount: {
+                                                    id: {{ $transaction->destinationAccount->id }},
+                                                    name: '{{ addslashes($transaction->destinationAccount->name) }}',
+                                                    image: '{{ $transaction->destinationAccount->institution->image }}'
+                                                },
+                                                category: null
+                                                @else
                                                 category: {
                                                     id: {{ $transaction->category->id }},
                                                     name: '{{ addslashes($transaction->category->name) }}',
                                                     icon: '{{ $transaction->category->icon }}',
                                                     color: '{{ $transaction->category->color }}'
                                                 }
+                                                @endif
                                             })"
                                         >
                                             <i class="bx bx-edit text-xl"></i>

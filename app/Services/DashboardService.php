@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionType;
 use App\Models\Transaction;
+use App\Support\TransactionAggregates;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
@@ -21,8 +24,8 @@ class DashboardService
             'total_balance' => $this->accountService->getTotalBalance($accounts),
             'balance_variation' => $this->getBalanceVariation($userId),
             'last_transactions' => $transactions,
-            'expenses_by_category' => $this->getByCategory($userId, 'expense'),
-            'incomes_by_category' => $this->getByCategory($userId, 'income'),
+            'expenses_by_category' => $this->getByCategory($userId, TransactionType::EXPENSE->value),
+            'incomes_by_category' => $this->getByCategory($userId, TransactionType::INCOME->value),
             'month_performace' => $this->getCurrentMonthPerformance($userId),
             'monthly_performance' => $this->getMonthlyPerformance($userId),
         ];
@@ -31,7 +34,7 @@ class DashboardService
     private function getLastTransactions(int $userId): Collection
     {
         return Transaction::where('user_id', $userId)
-            ->with(['category', 'account'])
+            ->with(['category', 'account.institution', 'destinationAccount.institution'])
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
             ->limit(5)
@@ -42,7 +45,7 @@ class DashboardService
     {
         return Transaction::where('transactions.user_id', $userId)
             ->join('categories', 'transactions.category_id', '=', 'categories.id')
-            ->where('categories.type', $type)
+            ->where('transactions.type', $type)
             ->whereMonth('transactions.date', now()->month)
             ->whereYear('transactions.date', now()->year)
             ->selectRaw('categories.name, categories.color, SUM(transactions.amount) as total')
@@ -54,12 +57,9 @@ class DashboardService
     private function getCurrentMonthPerformance(int $userId): ?Transaction
     {
         return Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->whereBetween('transactions.date', [now()->startOfMonth(), now()->endOfMonth()])
-            ->selectRaw("
-                SUM (CASE WHEN categories.type = 'income' THEN transactions.amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-            ")
+            ->selectRaw(TransactionAggregates::incomeExpenseSelectSql())
             ->first();
     }
 
@@ -68,17 +68,27 @@ class DashboardService
      */
     private function getMonthlyPerformance(int $userId): Collection
     {
+        $monthKey = $this->monthKeySql();
+
         return Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->where('transactions.date', '>=', now()->subMonths(6)->startOfMonth())
             ->selectRaw("
-            TO_CHAR(transactions.date, 'YYYY-MM') as month,
-            SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
-            SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-        ")
-            ->groupByRaw("TO_CHAR(transactions.date, 'YYYY-MM')")
+            {$monthKey} as month,
+            ".TransactionAggregates::incomeExpenseSelectSql().'
+        ')
+            ->groupByRaw($monthKey)
             ->orderBy('month')
             ->get();
+    }
+
+    private function monthKeySql(): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'pgsql' => "TO_CHAR(transactions.date, 'YYYY-MM')",
+            'sqlite' => "strftime('%Y-%m', transactions.date)",
+            default => "DATE_FORMAT(transactions.date, '%Y-%m')",
+        };
     }
 
     private function getBalanceVariation(int $userId): array
@@ -101,17 +111,13 @@ class DashboardService
         ];
     }
 
-    private function getMonthResult(int $userId, int $month, int $year): float
+    public function getMonthResult(int $userId, int $month, int $year): float
     {
         $result = Transaction::where('transactions.user_id', $userId)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->tap(fn ($q) => TransactionAggregates::excludeTransfers($q))
             ->whereMonth('transactions.date', $month)
             ->whereYear('transactions.date', $year)
-            ->selectRaw("
-            SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) -
-            SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END)
-            as result
-        ")
+            ->selectRaw(TransactionAggregates::netResultSql())
             ->value('result');
 
         return (float) ($result ?? 0);

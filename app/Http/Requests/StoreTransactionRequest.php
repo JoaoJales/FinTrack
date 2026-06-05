@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TransactionType;
 use App\Helpers\FormatHelper;
 use App\Http\Requests\Concerns\ValidatesTransactionReferences;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTransactionRequest extends FormRequest
 {
@@ -33,6 +35,12 @@ class StoreTransactionRequest extends FormRequest
                 'date' => Carbon::createFromFormat('d/m/Y', $this->date)->format('Y-m-d'),
             ]);
         }
+
+        if (! $this->type) {
+            $this->merge([
+                'type' => TransactionType::EXPENSE->value,
+            ]);
+        }
     }
 
     /**
@@ -42,9 +50,17 @@ class StoreTransactionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isTransfer = $this->isTransferType();
+
         return [
+            'type' => ['required', Rule::enum(TransactionType::class)],
             'account_id' => $this->accountIdRules(),
-            'category_id' => $this->categoryIdRules(),
+            'category_id' => $isTransfer
+                ? ['prohibited']
+                : $this->categoryIdRules(),
+            'destination_account_id' => $isTransfer
+                ? $this->destinationAccountIdRules()
+                : ['prohibited'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'description' => ['nullable', 'string', 'max:255'],
             'date' => ['nullable', 'date'],
@@ -56,6 +72,10 @@ class StoreTransactionRequest extends FormRequest
         return [
             'amount.required' => 'Campo (Valor) é obrigatório',
             'category_id.required' => 'Campo obrigatório',
+            'category_id.prohibited' => 'Transferências não possuem categoria',
+            'destination_account_id.required' => 'Selecione a conta de destino',
+            'destination_account_id.different' => 'A conta de destino deve ser diferente da conta de origem',
+            'destination_account_id.prohibited' => 'Conta de destino só é permitida em transferências',
         ];
     }
 }

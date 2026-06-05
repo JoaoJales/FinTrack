@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $user_id Usuário (Nullable)
  * @property string $icon Ícone opcional da Categoria
  * @property string $color Cor opcional da Categoria
- * @property TransactionType $type Tipo da transação (Ganho e Gasto)
+ * @property TransactionType $type Tipo da transação (Ganho e Gasto) - usado somente visualmente, na UI
  * @property bool $is_editable Diferencia se a categoria é global ou criada pelo usuário
  */
 class Category extends Model

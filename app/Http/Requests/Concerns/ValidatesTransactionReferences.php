@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\Concerns;
 
+use App\Enums\TransactionType;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
 trait ValidatesTransactionReferences
 {
     /**
-     * @return array<int, \Illuminate\Contracts\Validation\ValidationRule|string>
+     * @return array<int, ValidationRule|string>
      */
     protected function accountIdRules(): array
     {
@@ -18,7 +20,19 @@ trait ValidatesTransactionReferences
     }
 
     /**
-     * @return array<int, \Illuminate\Contracts\Validation\ValidationRule|string>
+     * @return array<int, ValidationRule|string>
+     */
+    protected function destinationAccountIdRules(): array
+    {
+        return [
+            'required',
+            Rule::exists('accounts', 'id')->where('user_id', $this->user()->id),
+            'different:account_id',
+        ];
+    }
+
+    /**
+     * @return array<int, ValidationRule|string>
      */
     protected function categoryIdRules(): array
     {
@@ -31,5 +45,10 @@ trait ValidatesTransactionReferences
                         ->orWhere('is_editable', false);
                 }),
         ];
+    }
+
+    protected function isTransferType(): bool
+    {
+        return $this->input('type') === TransactionType::TRANSFER->value;
     }
 }

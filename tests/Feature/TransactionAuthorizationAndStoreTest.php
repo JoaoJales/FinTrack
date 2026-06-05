@@ -17,6 +17,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
     private function storePayload(Account $account, Category $category): array
     {
         return [
+            'type' => $category->type->value,
             'account_id' => $account->id,
             'category_id' => $category->id,
             'amount' => '10,00',
@@ -45,6 +46,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
             'user_id' => $userA->id,
             'account_id' => $account->id,
             'category_id' => $category->id,
+            'type' => $category->type,
             'amount' => 25,
             'description' => 'Original',
             'date' => now()->toDateString(),
@@ -53,6 +55,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
         $response = $this->actingAs($userB)->patchJson(
             route('transactions.update', $transaction),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $account->id,
                 'category_id' => $category->id,
                 'amount' => '99,00',
@@ -76,6 +79,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
             'user_id' => $userA->id,
             'account_id' => $account->id,
             'category_id' => $category->id,
+            'type' => $category->type,
             'amount' => 25,
             'description' => 'Original',
             'date' => now()->toDateString(),
@@ -106,6 +110,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
         $response = $this->actingAs($userA)->postJson(
             route('transactions.store'),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $accountB->id,
                 'category_id' => $categoryA->id,
                 'amount' => '10,00',
@@ -128,6 +133,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
         $response = $this->actingAs($userA)->postJson(
             route('transactions.store'),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $accountA->id,
                 'category_id' => $categoryB->id,
                 'amount' => '10,00',
@@ -214,6 +220,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
         $response = $this->actingAs($userA)->patchJson(
             route('transactions.update', $transaction),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $accountA->id,
                 'category_id' => $categoryTrashed->id,
                 'amount' => '50,00',
@@ -256,6 +263,7 @@ class TransactionAuthorizationAndStoreTest extends TestCase
         $response = $this->actingAs($userA)->patchJson(
             route('transactions.update', $transaction),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $accountA->id,
                 'category_id' => $global->id,
                 'amount' => '50,00',

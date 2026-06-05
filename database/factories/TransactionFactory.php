@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\TransactionType;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -26,7 +27,9 @@ class TransactionFactory extends Factory
                 'institution_id' => null,
                 'is_default' => true,
             ]),
+            'destination_account_id' => null,
             'category_id' => Category::factory()->for($user)->expense(),
+            'type' => TransactionType::EXPENSE,
             'amount' => fake()->randomFloat(2, 1, 5000),
             'date' => fake()->date(),
             'description' => fake()->sentence(),
@@ -41,6 +44,39 @@ class TransactionFactory extends Factory
                 'is_default' => true,
             ]),
             'category_id' => Category::factory()->for($user)->expense(),
+            'type' => TransactionType::EXPENSE,
         ]);
+    }
+
+    public function income(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => TransactionType::INCOME,
+            'category_id' => Category::factory()->income(),
+        ]);
+    }
+
+    public function expense(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => TransactionType::EXPENSE,
+            'category_id' => Category::factory()->expense(),
+        ]);
+    }
+
+    public function transfer(?Account $destination = null): static
+    {
+        return $this->state(function (array $attributes) use ($destination) {
+            $userId = $attributes['user_id'] ?? User::factory();
+
+            return [
+                'type' => TransactionType::TRANSFER,
+                'category_id' => null,
+                'destination_account_id' => $destination ?? Account::factory()->for($userId)->state([
+                    'institution_id' => null,
+                    'is_default' => false,
+                ]),
+            ];
+        });
     }
 }

@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\User;
-use InvalidArgumentException;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class AccountService
 {

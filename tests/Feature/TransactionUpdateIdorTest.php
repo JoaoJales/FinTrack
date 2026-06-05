@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\AccountType;
+use App\Enums\TransactionType;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -17,6 +18,7 @@ class TransactionUpdateIdorTest extends TestCase
     private function payload(Transaction $transaction): array
     {
         return [
+            'type' => $transaction->type->value,
             'account_id' => $transaction->account_id,
             'category_id' => $transaction->category_id,
             'amount' => '50,00',
@@ -134,6 +136,7 @@ class TransactionUpdateIdorTest extends TestCase
         $response = $this->actingAs($userA)->patchJson(
             route('transactions.update', $transaction),
             [
+                'type' => TransactionType::EXPENSE->value,
                 'account_id' => $accountA2->id,
                 'category_id' => $categoryA2->id,
                 'amount' => '75,50',

@@ -10,6 +10,7 @@
         <input type="hidden" name="_method" x-bind:value="formMethod === 'PUT' ? 'PUT' : ''">
 
         <div x-init="$watch('active', type => {
+                 if (type === '{{ App\Enums\TransactionType::TRANSFER->value }}') return;
                  let cat = type === '{{ App\Enums\TransactionType::EXPENSE->value }}' ? defaultExpenseCategory : defaultIncomeCategory;
                  if (cat) {
                      selectedCategory = { id: cat.id, name: cat.name, icon: cat.icon ?? 'bx bx-category', color: cat.color ?? '#5c5e5c'};
@@ -20,7 +21,17 @@
             <div class="flex border-b border-gray-200 mb-6">
                 <x-tabs-link color="red" :value="App\Enums\TransactionType::EXPENSE->value">Gasto</x-tabs-link>
                 <x-tabs-link color="emerald" :value="App\Enums\TransactionType::INCOME->value">Ganho</x-tabs-link>
+                <x-tabs-link
+                    color="blue"
+                    :value="App\Enums\TransactionType::TRANSFER->value"
+                    x-bind:disabled="!canTransfer"
+                    x-bind:class="!canTransfer ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''"
+                >Transferência</x-tabs-link>
             </div>
+
+            <p x-show="!canTransfer" class="text-xs text-gray-500 mb-4 -mt-2">
+                Cadastre pelo menos duas contas para registrar transferências.
+            </p>
 
             <input type="hidden" name="type" :value="active">
 
@@ -38,15 +49,16 @@
                     <x-form.input name="date" x-model="transactionDate" x-mask="99/99/9999" placeholder="dd/mm/aaaa" label="Data" required/>
                 </div>
 
-                {{-- Conta --}}
+                {{-- Conta origem --}}
                 <div class="col-span-12">
                     <p class="text-xs mb-1 text-slate-600 font-medium">
-                        Conta <span class="text-red-600 text-xs">*</span>
+                        <span x-text="active === '{{ App\Enums\TransactionType::TRANSFER->value }}' ? 'Conta de origem' : 'Conta'"></span>
+                        <span class="text-red-600 text-xs">*</span>
                     </p>
                     <input type="hidden" name="account_id" :value="selectedAccount.id">
                     <div
                         class="w-full p-3 bg-gray-100 flex items-center gap-2 rounded-xl shadow-md cursor-pointer hover:bg-gray-200 transition"
-                        x-on:click="$dispatch('open-modal', 'account-select')"
+                        x-on:click="accountPickerTarget = 'origin'; $dispatch('open-modal', 'account-select')"
                     >
                         <div class="w-10 h-10 p-1 rounded-xl flex items-center justify-center shadow-sm bg-white">
                             <img :src="selectedAccount.image" :alt="selectedAccount.name" class="w-8 h-8 object-contain" alt=""/>
@@ -60,12 +72,34 @@
                     </div>
                 </div>
 
+                {{-- Conta destino --}}
+                <div class="col-span-12" x-show="active === '{{ App\Enums\TransactionType::TRANSFER->value }}'" x-cloak>
+                    <p class="text-xs mb-1 text-slate-600 font-medium">
+                        Conta de destino <span class="text-red-600 text-xs">*</span>
+                    </p>
+                    <input type="hidden" name="destination_account_id" :value="selectedDestinationAccount.id" x-bind:disabled="active !== '{{ App\Enums\TransactionType::TRANSFER->value }}'">
+                    <div
+                        class="w-full p-3 bg-gray-100 flex items-center gap-2 rounded-xl shadow-md cursor-pointer hover:bg-gray-200 transition"
+                        x-on:click="accountPickerTarget = 'destination'; $dispatch('open-modal', 'account-select')"
+                    >
+                        <div class="w-10 h-10 p-1 rounded-xl flex items-center justify-center shadow-sm bg-white">
+                            <img :src="selectedDestinationAccount.image" :alt="selectedDestinationAccount.name" class="w-8 h-8 object-contain" alt=""/>
+                        </div>
+                        <div class="flex items-center justify-between w-full">
+                            <div>
+                                <span class="text-base px-2 font-medium" x-text="selectedDestinationAccount.name"></span>
+                            </div>
+                            <i class="bx bx-chevron-right text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Categoria --}}
-                <div class="col-span-12">
+                <div class="col-span-12" x-show="active !== '{{ App\Enums\TransactionType::TRANSFER->value }}'">
                     <p class="text-xs mb-1 text-slate-600 font-medium">
                         Categoria <span class="text-red-600 text-xs">*</span>
                     </p>
-                    <input type="hidden" name="category_id" :value="selectedCategory.id">
+                    <input type="hidden" name="category_id" :value="selectedCategory.id" x-bind:disabled="active === '{{ App\Enums\TransactionType::TRANSFER->value }}'">
                     <div
                         class="w-full p-3 bg-gray-100 flex items-center gap-2 rounded-xl shadow-md cursor-pointer hover:bg-gray-200 transition"
                         x-on:click="$dispatch('open-modal', 'category-select')"

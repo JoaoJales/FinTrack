@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountType;
+use App\Support\TransactionAggregates;
 use Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -72,20 +73,23 @@ class Account extends Model
      */
     protected function currentBalance(): Attribute
     {
-        // O selectRaw() permite escrever SQL puro dentro da query do Eloquent.
         return Attribute::make(
             get: function () {
-                $transactions = $this->transactions()
-                    ->join('categories', 'transactions.category_id', '=', 'categories.id')
-                    ->selectRaw("
-                        SUM(CASE WHEN categories.type = 'income'  THEN transactions.amount ELSE 0 END) as total_income,
-                        SUM(CASE WHEN categories.type = 'expense' THEN transactions.amount ELSE 0 END) as total_expense
-                    ")
+                $accountId = $this->id;
+
+                $transactions = Transaction::query()
+                    ->where(function ($query) use ($accountId) {
+                        $query->where('account_id', $accountId)
+                            ->orWhere('destination_account_id', $accountId);
+                    })
+                    ->selectRaw(TransactionAggregates::accountBalanceSelectSql($accountId))
                     ->first();
 
                 return (float) $this->initial_balance
                     + (float) ($transactions->total_income ?? 0)
-                    - (float) ($transactions->total_expense ?? 0);
+                    - (float) ($transactions->total_expense ?? 0)
+                    - (float) ($transactions->total_transfer_out ?? 0)
+                    + (float) ($transactions->total_transfer_in ?? 0);
             }
         );
     }
