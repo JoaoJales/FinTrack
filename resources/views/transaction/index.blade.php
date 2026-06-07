@@ -243,7 +243,7 @@
                                 <x-table.col class="text-center align-middle">
                                     <div class="flex justify-center">
                                         @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
-                                            <div class="flex items-center gap-2 pr-2.5 py-1 rounded-full bg-gray-100 w-fit">
+                                            <div class="flex items-center gap-2 py-1 rounded-full bg-gray-100 w-fit">
                                                 <div class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm">
                                                     <x-institution-logo :image="$transaction->account->institution->image" :name="$transaction->account->institution->name" size="w-4 h-4"/>
                                                 </div>
