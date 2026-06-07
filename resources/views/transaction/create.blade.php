@@ -25,7 +25,6 @@
                     color="blue"
                     :value="App\Enums\TransactionType::TRANSFER->value"
                     x-bind:disabled="!canTransfer"
-                    x-bind:class="!canTransfer ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''"
                 >Transferência</x-tabs-link>
             </div>
 

@@ -12,10 +12,12 @@
 @endphp
 
 <button type="button"
-        @click="active = '{{ $value }}'"
-        :class="active === '{{ $value }}'
-    ? '{{ $activeStyles }} font-bold'
-    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-medium'"
-    {{ $attributes->merge(['class' => 'whitespace-nowrap py-3 px-8 border-b-2 text-sm transition-all -mb-px rounded-t-lg']) }}>
+        @click="!$el.disabled && (active = '{{ $value }}')"
+        :class="[
+            active === '{{ $value }}' ? '{{ $activeStyles }} font-bold' : 'border-transparent text-slate-500 font-medium',
+            active !== '{{ $value }}' && !$el.disabled ? 'hover:text-slate-700 hover:border-slate-300' : '',
+            $el.disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
+        ]"
+        {{ $attributes->merge(['class' => 'whitespace-nowrap py-3 px-8 border-b-2 text-sm transition-all -mb-px rounded-t-lg']) }}>
     {{ $slot }}
 </button>
