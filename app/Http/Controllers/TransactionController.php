@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TransactionType;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
+use App\Models\Account;
 use App\Models\Transaction;
 use App\Services\AccountService;
 use App\Services\CategoryService;
@@ -34,21 +35,11 @@ class TransactionController extends Controller
         $defaultExpenseCategory = $categoriesByType->get(TransactionType::EXPENSE->value)?->sortBy('id')->first();
         $defaultIncomeCategory = $categoriesByType->get(TransactionType::INCOME->value)?->sortBy('id')->first();
 
-        $defaultAccountData = [
-            'id' => $defaultAccount?->id,
-            'name' => $defaultAccount?->name,
-            'image' => $defaultAccount?->institution?->image,
-            'color' => $defaultAccount?->institution?->color ?? '#6B7280',
-        ];
+        $defaultAccountData = $this->accountPickerData($defaultAccount);
 
         $secondAccount = $accounts->count() >= 2 ? $accounts->where('id', '!=', $defaultAccount?->id)->first() : null;
 
-        $defaultDestinationAccountData = [
-            'id' => $secondAccount?->id,
-            'name' => $secondAccount?->name,
-            'image' => $secondAccount?->institution?->image,
-            'color' => $secondAccount?->institution?->color ?? '#6B7280',
-        ];
+        $defaultDestinationAccountData = $this->accountPickerData($secondAccount);
 
         $canTransfer = $accounts->count() >= 2;
 
@@ -95,5 +86,27 @@ class TransactionController extends Controller
         $this->transactionService->destroy($transaction);
 
         return to_route('transactions.index')->with('success', 'Transação deletada com sucesso!');
+    }
+
+    /**
+     * @return array{id: int|null, name: string, image: string, color: string}
+     */
+    private function accountPickerData(?Account $account): array
+    {
+        if ($account === null) {
+            return [
+                'id' => null,
+                'name' => 'Selecione uma conta',
+                'image' => asset('banks-logos/default-bank.svg'),
+                'color' => '#6B7280',
+            ];
+        }
+
+        return [
+            'id' => $account->id,
+            'name' => $account->name,
+            'image' => asset($account->institution?->image ?? 'banks-logos/default-bank.svg'),
+            'color' => $account->institution?->color ?? '#6B7280',
+        ];
     }
 }

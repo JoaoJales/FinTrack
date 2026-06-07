@@ -28,10 +28,6 @@
                 >Transferência</x-tabs-link>
             </div>
 
-            <p x-show="!canTransfer" class="text-xs text-gray-500 mb-4 -mt-2">
-                Cadastre pelo menos duas contas para registrar transferências.
-            </p>
-
             <input type="hidden" name="type" :value="active">
 
             <div class="grid grid-cols-12 gap-4">
@@ -60,11 +56,18 @@
                         x-on:click="accountPickerTarget = 'origin'; $dispatch('open-modal', 'account-select')"
                     >
                         <div class="w-10 h-10 p-1 rounded-xl flex items-center justify-center shadow-sm bg-white">
-                            <img :src="selectedAccount.image" :alt="selectedAccount.name" class="w-8 h-8 object-contain" alt=""/>
+                            <template x-if="selectedAccount.id">
+                                <img :src="selectedAccount.image" :alt="selectedAccount.name" class="w-8 h-8 object-contain"/>
+                            </template>
+                            <template x-if="!selectedAccount.id">
+                                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                    <i class="bx bx-wallet text-gray-400 text-xl"></i>
+                                </div>
+                            </template>
                         </div>
                         <div class="flex items-center justify-between w-full">
                             <div>
-                                <span class="text-base px-2 font-medium" x-text="selectedAccount.name"></span>
+                                <span class="text-base px-2 font-medium" :class="!selectedAccount.id ? 'text-gray-400' : ''" x-text="selectedAccount.name"></span>
                             </div>
                             <i class="bx bx-chevron-right text-3xl text-blue-500"></i>
                         </div>
@@ -82,11 +85,18 @@
                         x-on:click="accountPickerTarget = 'destination'; $dispatch('open-modal', 'account-select')"
                     >
                         <div class="w-10 h-10 p-1 rounded-xl flex items-center justify-center shadow-sm bg-white">
-                            <img :src="selectedDestinationAccount.image" :alt="selectedDestinationAccount.name" class="w-8 h-8 object-contain" alt=""/>
+                            <template x-if="selectedDestinationAccount.id">
+                                <img :src="selectedDestinationAccount.image" :alt="selectedDestinationAccount.name" class="w-8 h-8 object-contain"/>
+                            </template>
+                            <template x-if="!selectedDestinationAccount.id">
+                                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                    <i class="bx bx-wallet text-gray-400 text-xl"></i>
+                                </div>
+                            </template>
                         </div>
                         <div class="flex items-center justify-between w-full">
                             <div>
-                                <span class="text-base px-2 font-medium" x-text="selectedDestinationAccount.name"></span>
+                                <span class="text-base px-2 font-medium" :class="!selectedDestinationAccount.id ? 'text-gray-400' : ''" x-text="selectedDestinationAccount.name"></span>
                             </div>
                             <i class="bx bx-chevron-right text-3xl text-blue-500"></i>
                         </div>

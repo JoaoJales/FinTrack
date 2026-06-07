@@ -1,6 +1,6 @@
 <x-modal name="account-select" title="Contas" width="max-w-sm sm:max-w-md md:max-w-lg">
     <div class="grid grid-cols-1 gap-3">
-        @foreach($accounts as $account)
+        @forelse($accounts as $account)
             <button
                 type="button"
                 class="w-full p-3 bg-gray-50 hover:bg-blue-50 border-2 border-gray-100 hover:border-blue-400 flex items-center gap-3 rounded-xl transition cursor-pointer"
@@ -8,7 +8,7 @@
                     const data = {
                         id: '{{ $account->id }}',
                         name: '{{ addslashes($account->name) }}',
-                        image: '{{ $account->institution->image }}',
+                        image: '{{ asset($account->institution->image ?? 'banks-logos/default-bank.svg') }}',
                         institutionName: '{{ addslashes($account->institution->name) }}'
                     };
                     if (accountPickerTarget === 'destination') {
@@ -27,7 +27,14 @@
                     <div><p class="font-bold text-gray-900 text-sm">R$ @moneyBr($account->current_balance)</p></div>
                 </div>
             </button>
-        @endforeach
+        @empty
+            <div class="flex flex-col items-center justify-center py-8 gap-3 text-center">
+                <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center">
+                    <i class="bx bx-wallet text-2xl text-gray-300"></i>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Nenhuma conta cadastrada ainda.</p>
+            </div>
+        @endforelse
     </div>
 
     <div class="p-4 w-full mt-2 flex items-center justify-center border-t border-gray-100">

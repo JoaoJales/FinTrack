@@ -289,13 +289,13 @@
                                                 account: {
                                                     id: {{ $transaction->account->id }},
                                                     name: '{{ addslashes($transaction->account->name) }}',
-                                                    image: '{{ $transaction->account->institution->image }}'
+                                                    image: '{{ asset($transaction->account->institution->image ?? 'banks-logos/default-bank.svg') }}'
                                                 },
                                                 @if($transaction->type === \App\Enums\TransactionType::TRANSFER)
                                                 destinationAccount: {
                                                     id: {{ $transaction->destinationAccount->id }},
                                                     name: '{{ addslashes($transaction->destinationAccount->name) }}',
-                                                    image: '{{ $transaction->destinationAccount->institution->image }}'
+                                                    image: '{{ asset($transaction->destinationAccount->institution->image ?? 'banks-logos/default-bank.svg') }}'
                                                 },
                                                 category: null
                                                 @else
