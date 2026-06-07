@@ -13,13 +13,17 @@ class CategorySeeder extends Seeder
             // DESPESAS (Expenses)
             ['name' => 'Alimentação', 'type' => 'expense', 'icon' => 'bx bx-restaurant', 'color' => '#FF6B6B'],
             ['name' => 'Moradia', 'type' => 'expense', 'icon' => 'bx bx-home-alt', 'color' => '#4ECDC4'],
-            ['name' => 'Transporte', 'type' => 'expense', 'icon' => 'bx bx-car', 'color' => '#45B7D1'],
+            ['name' => 'Transporte', 'type' => 'expense', 'icon' => 'bx bx-bus', 'color' => '#45B7D1'],
             ['name' => 'Saúde', 'type' => 'expense', 'icon' => 'bx bx-health', 'color' => '#19BD70'],
             ['name' => 'Educação', 'type' => 'expense', 'icon' => 'bx bxs-graduation', 'color' => '#EDC737'],
             ['name' => 'Lazer', 'type' => 'expense', 'icon' => 'bx bx-party', 'color' => '#D45757'],
             ['name' => 'Viagem', 'type' => 'expense', 'icon' => 'bx bxs-plane-alt', 'color' => '#F39C12'],
             ['name' => 'Transferências', 'type' => 'expense', 'icon' => 'bx bx-transfer', 'color' => '#34495E'],
             ['name' => 'Pet', 'type' => 'expense', 'icon' => 'bx bxs-dog', 'color' => '#9B59B6'],
+            ['name' => 'Academia', 'type' => 'expense', 'icon' => 'bx bx-dumbbell', 'color' => '#E74C3C'],
+            ['name' => 'Compras', 'type' => 'expense', 'icon' => 'bx bx-shopping-bag', 'color' => '#E67E22'],
+            ['name' => 'Assinaturas', 'type' => 'expense', 'icon' => 'bx bx-repeat', 'color' => '#8E44AD'],
+            ['name' => 'Carro', 'type' => 'expense', 'icon' => 'bx bx-car', 'color' => '#2980B9'],
             ['name' => 'Dívidas', 'type' => 'expense', 'icon' => 'bx bx-receipt', 'color' => '#C0392B'],
             ['name' => 'Outros (gastos)', 'type' => 'expense', 'icon' => 'bx bx-dots-horizontal-rounded', 'color' => '#7F8C8D'],
 

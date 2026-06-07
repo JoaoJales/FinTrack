@@ -16,7 +16,6 @@ class DemoCategorySeeder extends Seeder
 
         $categories = [
             // DESPESAS personalizadas
-            ['name' => 'Academia',          'type' => 'expense', 'icon' => 'bx bx-dumbbell',     'color' => '#E74C3C'],
             ['name' => 'Streaming',         'type' => 'expense', 'icon' => 'bx bx-tv',           'color' => '#8E44AD'],
             ['name' => 'Restaurante',       'type' => 'expense', 'icon' => 'bx bx-food-menu',    'color' => '#E67E22'],
             ['name' => 'Mercado',           'type' => 'expense', 'icon' => 'bx bx-cart',         'color' => '#27AE60'],

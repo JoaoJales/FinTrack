@@ -1,28 +1,26 @@
 <x-modal name="nova-categoria" width="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
     <x-slot name="headerTitle">Nova Categoria</x-slot>
 
-    <div x-data="{
-            name: '',
-            type: '{{ App\Enums\TransactionType::EXPENSE->value }}',
-            icon: 'bx-tag',
-            color: '#6366f1',
-            icons: [
-                'bx-tag','bx-home','bx-car','bx-food-menu','bx-cart','bx-heart',
-                'bx-book','bx-game','bx-briefcase','bx-plane','bx-credit-card',
-                'bx-gift','bx-music','bx-dumbbell','bx-store','bx-coffee',
-                'bx-mobile','bx-devices','bx-dollar-circle','bx-trending-up',
-            ],
+    <div x-data='{
+            name: "",
+            type: "{{ App\Enums\TransactionType::EXPENSE->value }}",
+            icon: "bx-tag",
+            color: "#6366f1",
+            icons: @json(config("category.icons")),
             colors: [
-                '#6366f1','#ec4899','#f97316','#eab308','#22c55e',
-                '#14b8a6','#3b82f6','#a855f7','#ef4444','#64748b',
+                "#6366f1","#ec4899","#f97316","#eab308","#22c55e",
+                "#14b8a6","#3b82f6","#a855f7","#ef4444","#64748b",
             ],
-        }"
+            iconClass(ic) {
+                return "bx " + ic;
+            },
+        }'
          x-on:open-modal.window="
             if ($event.detail === 'nova-categoria') {
-                name  = '';
-                type  = '{{ App\Enums\TransactionType::EXPENSE->value }}';
-                icon  = 'bx-tag';
-                color = '#6366f1';
+                name  = "";
+                type  = "{{ App\Enums\TransactionType::EXPENSE->value }}";
+                icon  = "bx-tag";
+                color = "#6366f1";
             }
          "
     >
@@ -38,7 +36,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <div class="w-16 h-16 rounded-xl flex items-center justify-center text-3xl shadow-sm transition-all duration-200"
                              :style="`background-color: ${color};`">
-                            <i class="bx text-white" :class="icon"></i>
+                            <i class="text-white" :class="iconClass(icon)"></i>
                         </div>
                         <span class="text-xs text-gray-400 font-medium" x-text="name || 'Pré-visualização'"></span>
                     </div>
@@ -95,8 +93,8 @@
                 {{-- Icon picker --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Ícone</label>
-                    <input type="hidden" name="icon" :value="'bx ' + icon">
-                    <div class="grid grid-cols-10 gap-1.5">
+                    <input type="hidden" name="icon" :value="iconClass(icon)">
+                    <div class="grid grid-cols-10 gap-1.5 max-h-44 overflow-y-auto pr-1">
                         <template x-for="ic in icons" :key="ic">
                             <button
                                 type="button"
@@ -106,7 +104,7 @@
                                 :style="icon === ic ? `background-color: ${color};` : ''"
                                 :title="ic"
                             >
-                                <i class="bx" :class="ic"></i>
+                                <i :class="iconClass(ic)"></i>
                             </button>
                         </template>
                     </div>
