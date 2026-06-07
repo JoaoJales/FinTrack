@@ -6,7 +6,9 @@ use App\Enums\AccountType;
 use App\Models\Account;
 use App\Models\Institution;
 use App\Models\User;
+use App\Services\AccountService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AccountContractTest extends TestCase
@@ -183,5 +185,30 @@ class AccountContractTest extends TestCase
                 'initial_balance' => '0,00',
             ]),
         )->assertRedirect(route('accounts.index'))->assertSessionHasErrors('name');
+    }
+
+    public function test_get_accounts_by_user_does_not_trigger_n_plus_one_balance_queries(): void
+    {
+        $user = User::factory()->create();
+        $institution = $this->institution();
+
+        for ($i = 1; $i <= 5; $i++) {
+            Account::factory()->for($user)->create([
+                'institution_id' => $institution->id,
+                'name' => "Conta {$i}",
+            ]);
+        }
+
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+
+        $accounts = app(AccountService::class)->getAccountsByUser($user->id);
+        $accounts->each(fn (Account $account) => $account->current_balance);
+
+        $transactionQueries = collect(DB::getQueryLog())
+            ->filter(fn (array $query) => str_contains($query['query'], 'transactions'))
+            ->count();
+
+        $this->assertLessThanOrEqual(3, $transactionQueries);
     }
 }

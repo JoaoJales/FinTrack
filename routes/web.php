@@ -16,9 +16,9 @@ Route::middleware([
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('accounts', AccountController::class);
-    Route::resource('transactions', TransactionController::class);
-    Route::resource('categories', CategoryController::class);
+    Route::resource('accounts', AccountController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::get('/balance', [BalanceController::class, 'index'])
         ->name('balance.index');

@@ -10,6 +10,7 @@ use App\Services\AccountService;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -22,12 +23,12 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Transaction::class);
-        $transactions = $this->transactionService->getAllByUser(auth()->id(), $request);
+        $transactions = $this->transactionService->getAllByUser(Auth::id(), $request);
 
-        $accounts = $this->accountService->getAccountsByUser(auth()->id());
+        $accounts = $this->accountService->getAccountsByUser(Auth::id());
         $defaultAccount = $accounts->firstWhere('is_default', true);
 
-        $categories = $this->categoryService->getAllByUser(auth()->id())->sortBy('id');
+        $categories = $this->categoryService->getAllByUser(Auth::id())->sortBy('id');
         $categoriesByType = $categories->groupBy('type');
 
         $defaultExpenseCategory = $categoriesByType->get(TransactionType::EXPENSE->value)?->sortBy('id')->first();
@@ -74,35 +75,12 @@ class TransactionController extends Controller
         );
     }
 
-    public function create()
-    {
-        $this->authorize('create', Transaction::class);
-
-        return view('transaction.create');
-    }
-
     public function store(StoreTransactionRequest $request)
     {
-        $this->transactionService->store($request->validated(), auth()->id());
+        $this->transactionService->store($request->validated(), Auth::id());
 
         return to_route('transactions.index')->with('success', 'Transação criada com sucesso!');
     }
-
-    //    public function show(Transaction $transaction)
-    //    {
-    //        $this->authorize('view', $transaction);
-    //
-    //        return view('transactions.show', compact('transaction'));
-    //    }
-    //
-    //    public function edit(Transaction $transaction)
-    //    {
-    //        $this->authorize('update', $transaction);
-    //        $accounts = $this->accountService->getAccountsByUser(auth()->id());
-    //        $categories = $this->categoryService->getAllByUser(auth()->id());
-    //
-    //        return view('transactions.edit', compact('transaction', 'accounts', 'categories'));
-    //    }
 
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
     {

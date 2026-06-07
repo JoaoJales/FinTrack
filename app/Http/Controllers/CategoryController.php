@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -16,37 +17,16 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Category::class);
-        $categories = $this->categoryService->getAllCreatedByUser(auth()->id(), $request->get('type', TransactionType::EXPENSE->value));
+        $categories = $this->categoryService->getAllCreatedByUser(Auth::id(), $request->get('type', TransactionType::EXPENSE->value));
 
         return view('categories.index', compact('categories'));
     }
 
-    public function create()
-    {
-        $this->authorize('create', Category::class);
-
-        return view('categories.create');
-    }
-
     public function store(StoreCategoryRequest $request)
     {
-        $this->categoryService->store($request->validated(), auth()->id());
+        $this->categoryService->store($request->validated(), Auth::id());
 
         return to_route('categories.index')->with('success', 'Categoria criada com sucesso!.');
-    }
-
-    //    public function show(Category $category)
-    //    {
-    //        $this->authorize('view', $category);
-    //
-    //        return view('categories.show', compact('category'));
-    //    }
-
-    public function edit(Category $category)
-    {
-        $this->authorize('update', $category);
-
-        return view('categories.edit', compact('category'));
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)

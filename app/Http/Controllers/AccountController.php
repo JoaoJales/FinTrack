@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use App\Models\Institution;
 use App\Services\AccountService;
+use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 
 class AccountController extends Controller
@@ -18,7 +19,7 @@ class AccountController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Account::class);
-        $accounts = $this->accountService->getAccountsByUser(auth()->id());
+        $accounts = $this->accountService->getAccountsByUser(Auth::id());
         $institutions = Institution::all();
         $accountsCount = $accounts->count();
         $total_balance = $this->accountService->getTotalBalance($accounts);
@@ -26,37 +27,16 @@ class AccountController extends Controller
         return view('accounts.index', compact('accounts', 'institutions', 'accountsCount', 'total_balance'));
     }
 
-    public function create()  // View criar contas
-    {
-        $this->authorize('create', Account::class);
-
-        return view('accounts.create');
-    }
-
     public function store(StoreAccountRequest $request)
     {
         try {
-            $this->accountService->store($request->validated(), auth()->id());
+            $this->accountService->store($request->validated(), Auth::id());
 
             return to_route('accounts.index')->with('success', 'Conta criada com sucesso!');
         } catch (InvalidArgumentException $e) {
             return to_route('accounts.index')->with('error', $e->getMessage());
         }
     }
-
-    //    public function show(Account $account)
-    //    {
-    //        $this->authorize('view', $account);
-    //
-    //        return view('accounts.show', compact('account'));
-    //    }
-    //
-    //    public function edit(Account $account)
-    //    {
-    //        $this->authorize('update', $account);
-    //
-    //        return view('accounts.edit', compact('account'));
-    //    }
 
     public function update(UpdateAccountRequest $request, Account $account)
     {

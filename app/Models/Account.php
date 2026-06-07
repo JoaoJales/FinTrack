@@ -74,7 +74,11 @@ class Account extends Model
     protected function currentBalance(): Attribute
     {
         return Attribute::make(
-            get: function () {
+            get: function (?float $value) {
+                if ($value !== null) {
+                    return (float) $value;
+                }
+
                 $accountId = $this->id;
 
                 $transactions = Transaction::query()

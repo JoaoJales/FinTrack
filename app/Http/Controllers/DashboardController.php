@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\DashboardService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DashboardController
@@ -13,7 +14,7 @@ class DashboardController
 
     public function index(): View
     {
-        $data = $this->dashboardService->getDashboardData(auth()->id());
+        $data = $this->dashboardService->getDashboardData(Auth::id());
 
         return \view('dashboard.index', $data);
     }
